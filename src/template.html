@@ -176,7 +176,6 @@ dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(5
 .archbar button{font:inherit;font-size:13px;font-weight:600;color:var(--gold-lo);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 :root[data-theme=dark] .archbar button{color:var(--gold-hi)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]) .archbar button{color:var(--gold-hi)}}
-#bAcct{position:relative;overflow:hidden}#bAcct img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .acct{display:flex;align-items:center;gap:14px;margin:4px 0 16px}
 .acct .av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:20px;color:var(--gold-ink);background:linear-gradient(180deg,var(--gold-hi),var(--gold));overflow:hidden}
 .acct .av img{width:100%;height:100%;object-fit:cover}
@@ -237,7 +236,6 @@ details.fold[open]>summary{margin-bottom:14px}
     </a>
     <div class="icons">
       <a class="ib" href="../" aria-label="Home" title="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9v10.5h4.5v-6h4v6h4.5V9"/></svg></a>
-      <button class="ib" id="bAcct" type="button" aria-label="Account" title="Sign in to save your history" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg><img id="acctPic" alt="" hidden referrerpolicy="no-referrer"></button>
       <a class="ib" href="#how" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2.3-2.6 4"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/></svg></a>
       <button class="ib" id="bStats" type="button" aria-label="Statistics" title="Statistics"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="7" width="4" height="13" rx="1.2"/><rect x="16" y="3.5" width="4" height="16.5" rx="1.2"/></svg></button>
       <button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
@@ -407,22 +405,17 @@ details.fold[open]>summary{margin-bottom:14px}
   <p class="legend" aria-hidden="true"><span><i class="won"></i>Solved</span><span><i class="lost"></i>Missed</span><span><i class="on"></i>Started</span><span><i></i>Not played</span></p>
 </div></dialog>
 
-<dialog id="dAcct" aria-labelledby="acctTitle"><div class="dlg">
-  <button class="x" type="button" aria-label="Close" data-close>×</button>
-  <h2 id="acctTitle">Your account</h2>
-  <div id="acctBody"></div>
-</div></dialog>
+
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="../config.js"></script>
+<script src="../account.js"></script>
 <script>
 {
 // Settings live in /config.js (shared with the home page): contact email and Firebase sign-in config.
 const CFG = window.WICKETLE_CONFIG || {};
 const CONTACT_EMAIL = CFG.contactEmail || "";
-const FIREBASE_CONFIG = CFG.firebase || null;
-const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/13.2.0/";
 const RAW = /*__DATA__*/[];
 // Simplified flag drawings (inline SVG, so they show on every device; emoji flags don't on Windows)
 const F = (body) => `<svg class="flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false">${body}</svg>`;
@@ -784,9 +777,8 @@ function drawArchive(){
 }
 $("#bArch").onclick = () => {drawArchive(); $("#dArch").showModal();};
 
-// ---------- Google sign-in (Firebase) ----------
-if (FIREBASE_CONFIG) {
-  const GLOGO = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+// ---------- history sync for signed-in players (sign-in itself lives in /account.js) ----------
+if (window.WicketleAccount && WicketleAccount.enabled) {
   let fb = null, user = null, ready = false;
   const queue = {}; let timer = null;
   // keep the better of two saved attempts at the same puzzle
@@ -796,13 +788,6 @@ if (FIREBASE_CONFIG) {
     const out = {g:pick.g, done:pick.done, won:pick.won};
     if ((!local || local.a) && (!remote || remote.a)) out.a = 1;   // daily if either device played it on the day
     return out;
-  }
-  async function load(){
-    if (fb) return fb;
-    const [app, auth, fs] = await Promise.all(["firebase-app.js", "firebase-auth.js", "firebase-firestore.js"].map(f => import(FIREBASE_SDK + f)));
-    const a = app.initializeApp(FIREBASE_CONFIG);
-    fb = {auth, fs, A:auth.getAuth(a), db:fs.getFirestore(a)};
-    return fb;
   }
   sync.push = (m, d, e) => {
     if (!user || !ready) return;
@@ -831,48 +816,15 @@ if (FIREBASE_CONFIG) {
     }
     if (Object.keys(up).length) await fb.fs.setDoc(fb.fs.doc(fb.db, "users", user.uid), {hist:up, updated:Date.now()}, {merge:true});
     ready = true;
-    if (!practice) {loadDay(play); render(false);}
+    if (!practice && mode === DAILY) {loadDay(play); render(false);}
   }
-  function drawAcct(){
-    const b = $("#acctBody");
-    if (!user) {
-      b.innerHTML = `<p class="dnote">Sign in to keep your guesses, streaks and archive on every device you play on.</p>
-        <button class="btn gbtn" id="bGoogle" type="button">${GLOGO}Sign in with Google</button>
-        <p class="dnote" style="margin:16px 0 0;font-size:13px">We only use your Google name, email and photo to show who's signed in. See <a href="../#privacy">Privacy</a>.</p>`;
-      $("#bGoogle").onclick = async () => {
-        try {await load(); await fb.auth.signInWithPopup(fb.A, new fb.auth.GoogleAuthProvider()); $("#dAcct").close();}
-        catch (e) {if (!/popup-closed|cancelled-popup/.test(e.code || "")) toast("Sign-in didn't work. Please try again."); console.warn(e);}
-      };
-    } else {
-      const name = user.displayName || user.email;
-      b.innerHTML = `<div class="acct"><span class="av">${user.photoURL ? `<img src="${user.photoURL}" alt="" referrerpolicy="no-referrer">` : (name || "?").charAt(0).toUpperCase()}</span><span><b></b><small></small></span></div>
-        <p class="dnote">${ready ? "Your history is saved to your account and syncs across devices." : "Syncing your history…"}</p>
-        <button class="btn ghost" id="bSignOut" type="button">Sign out</button><br>
-        <button class="linkbtn" id="bDelAcct" type="button">Delete my saved history from my account</button>`;
-      b.querySelector(".acct b").textContent = user.displayName || "";
-      b.querySelector(".acct small").textContent = user.email || "";
-      $("#bSignOut").onclick = async () => {await fb.auth.signOut(fb.A); $("#dAcct").close(); toast("Signed out. Your history stays on this device.");};
-      $("#bDelAcct").onclick = async () => {
-        if (!confirm("Delete your Wicketle history from your account? It stays on this device.")) return;
-        try {await fb.fs.deleteDoc(fb.fs.doc(fb.db, "users", user.uid)); await fb.auth.signOut(fb.A); $("#dAcct").close(); toast("Deleted from your account and signed out");}
-        catch (e) {toast("Couldn't delete. Please try again."); console.warn(e);}
-      };
-    }
-  }
-  const ab = $("#bAcct"); ab.hidden = false;
-  ab.onclick = () => {drawAcct(); $("#dAcct").showModal();};
-  load().then(() => fb.auth.onAuthStateChanged(fb.A, async u => {
+  WicketleAccount.onChange(async u => {
     user = u; ready = false;
-    $("#acctPic").hidden = !(u && u.photoURL); if (u && u.photoURL) $("#acctPic").src = u.photoURL;
-    ab.setAttribute("aria-label", u ? `Account: signed in as ${u.displayName || u.email}` : "Sign in to save your history");
-    ab.title = u ? "Your account" : "Sign in to save your history";
-    if (u) {
-      try {await pullAndMerge(); toast(`Signed in as ${u.displayName || u.email}`);}
-      catch (e) {console.warn(e); toast("Signed in, but couldn't load your saved history");}
-    }
-    if ($("#dAcct").open) drawAcct();
-  })).catch(e => {console.warn("Wicketle: sign-in unavailable", e); ab.hidden = true;});
-  $("#ruleSave").textContent = "Stats and streaks are saved on this device. Sign in with Google to keep them in your account and use them on other devices.";
+    if (!u) return;
+    try {fb = await WicketleAccount.load(); await pullAndMerge();}
+    catch (e) {console.warn(e); toast("Signed in, but couldn't load your saved history");}
+  });
+  $("#ruleSave").textContent = "Stats and streaks are saved on this device. Sign in from the profile button to keep them in your account and use them on other devices.";
 }
 
 if (mode === DAILY) {loadDaily(); render(false);}

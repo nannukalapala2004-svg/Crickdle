@@ -76,11 +76,19 @@ Match data comes from [Cricsheet](https://cricsheet.org), released under the Ope
 ## Archive
 The Archive button opens a calendar of every daily puzzle since Puzzle #1 (23 Nov 2026). Tap a date to play it. The daily history is kept in `localStorage` under `crickdle:hist:normal`: one entry per puzzle day, `{g: [player ids], done, won, a: 1}` where `a` marks a game played from the archive after its day. Stats and streaks are worked out from this history and count only games played on their own day.
 
-## Google sign-in (optional)
-Sign-in uses Google Firebase (free Spark plan). It stays switched off, with no account button, until you add your project's settings.
+## Accounts and donations (optional)
+Every page has a profile button (added by `account.js`, which all pages load). Its panel offers sign-in, sign-out, "delete my saved history", and a **Support Wicketle** donate section. Everything is controlled from `config.js`:
 
-1. Go to https://console.firebase.google.com, click **Create a project**, name it `wicketle`, and turn Google Analytics off (not needed).
-2. **Build → Authentication → Get started → Sign-in method → Google → Enable**. Pick a support email and save.
+- `donate.upi`: your UPI ID. Desktop shows it with a Copy button; phones also get a "Donate with UPI" button that opens GPay / PhonePe / Paytm. `donate.url`: a donation page (Buy Me a Coffee, Ko-fi, a Razorpay payment page...). Leave both empty to hide the section. Money goes straight to you; the site never handles payment details.
+- `firebase`: switches sign-in on. Until it's set, the panel says accounts are coming soon.
+- `appleSignIn`: set to `true` only after Apple sign-in is set up (needs a paid Apple Developer account).
+
+### Setting up sign-in (Firebase, free Spark plan)
+1. Go to https://console.firebase.google.com, click **Create a project**, name it `wicketle`, and turn Google Analytics off.
+2. **Build → Authentication → Get started → Sign-in method**:
+   - **Google → Enable**, pick a support email, save.
+   - **Email/Password → Enable**, and also turn on **Email link (passwordless sign-in)**, save.
+   - Apple (optional): **Apple → Enable** and follow Firebase's steps (Apple Developer account, Services ID, key). Then set `appleSignIn: true` in `config.js`.
 3. **Authentication → Settings → Authorized domains → Add domain**: `nannukalapala2004-svg.github.io` (and your custom domain later).
 4. **Build → Firestore Database → Create database**. Choose a location near your players (for India, `asia-south1` Mumbai) and start in **production mode**.
 5. In Firestore, open the **Rules** tab, replace everything with the contents of `firestore.rules` from this repository, and click **Publish**.
@@ -89,9 +97,7 @@ Sign-in uses Google Firebase (free Spark plan). It stays switched off, with no a
 
 The web config (apiKey and so on) is not a secret: it only identifies the project. The Firestore rules are what keep each player's history private to them.
 
-Each signed-in player has one document, `users/<their uid>`, holding `{hist: {<mode>: {<day>: entry}}, updated}`. On sign-in the device's history and the account's history are merged (a finished game beats an unfinished one; a game counts as daily if any device played it on its day). After that, every guess is saved to the account.
-
-Note: saved progress uses `localStorage` keys starting `crickdle:` (the game's earlier name). They are kept on purpose so players don't lose their history; don't rename them.
+Each signed-in player has one document, `users/<their uid>`, holding `{hist: {<mode>: {<day>: entry}}, updated}`. Player of the Day merges the device's history with the account's on sign-in (a finished game beats an unfinished one; a game counts as daily if any device played it on its day) and then saves every guess. Career Path and Super Over don't sync yet.
 
 ## Career Path (`path/`)
 A second game with two modes, each with its own daily puzzle (resets at local midnight) and unlimited practice:

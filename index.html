@@ -32,6 +32,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .ball{width:34px;height:34px;filter:drop-shadow(0 6px 14px rgb(200 30 50/.35))}
 .mark b{font-size:27px;font-weight:700;letter-spacing:-.02em}
 .mark b span{background:linear-gradient(180deg,var(--gold-hi),var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.icons{display:flex;gap:8px}
 .ib{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink)}
 .ib svg{width:20px;height:20px}.ib .sun{display:none}
 :root[data-theme=dark] .ib .moon{display:none}:root[data-theme=dark] .ib .sun{display:block}
@@ -110,7 +111,7 @@ details.fold[open]>summary{margin-bottom:14px}
       <svg class="ball" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="bg1" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e2384a"/><stop offset="1" stop-color="#7d0f1d"/></radialGradient><linearGradient id="gs" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3d48a"/><stop offset="1" stop-color="#b8862d"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#bg1)"/><path d="M9.5 4.2c3.8 6.3 3.8 17.3 0 23.6M22.5 4.2c-3.8 6.3-3.8 17.3 0 23.6" fill="none" stroke="url(#gs)" stroke-width="1.5" stroke-dasharray="1.6 1.8"/><ellipse cx="11.5" cy="10" rx="4.5" ry="3" fill="#fff" opacity=".18"/></svg>
       <b>Wicket<span>le</span></b>
     </a>
-    <button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    <div class="icons"><button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button></div>
   </header>
 
   <main>
@@ -133,7 +134,8 @@ details.fold[open]>summary{margin-bottom:14px}
 
     <section id="privacy"><details class="fold"><summary><h2>Privacy</h2></summary>
       <p>Wicketle has no ads and no analytics. Unless you sign in, your guesses, streaks and settings are saved only in your own browser's local storage, and nothing is sent to us. Clearing your browser data resets them.</p>
-      <p id="privSignIn" hidden>Signing in is optional. If you sign in with Google, your Google account name, email address and photo, and your Wicketle game history, are stored with Google Firebase so you can use them on other devices. Only you can read your history. You can delete it at any time from the account button in the game, and signing out stops syncing.</p>
+      <p id="privSignIn" hidden>Signing in is optional. If you sign in with Google, Apple or an email link, your name, email address and photo (if your account has one), and your Wicketle game history, are stored with Google Firebase so you can use them on other devices. Only you can read your history. You can delete it at any time from the profile button, and signing out stops syncing.</p>
+      <p id="privDonate" hidden>Donations are optional and are paid through your UPI app or the donation site. Wicketle never sees your bank or card details; we only receive the payment and whatever that service shares with us, such as your name.</p>
       <p>The game shows public sporting records about professional cricketers: names, countries, teams, match stats and ages. If you are a player featured here and want something corrected or removed, please get in touch<span id="privContact" hidden> at <a id="privLink" href="#"></a></span>.</p>
       </details>
     </section>
@@ -148,6 +150,7 @@ details.fold[open]>summary{margin-bottom:14px}
 </div>
 
 <script src="config.js"></script>
+<script src="account.js"></script>
 <script>
 {
 /* ---------- Add new games here ----------
@@ -234,6 +237,7 @@ if (CFG.contactEmail) {
   }
 }
 if (CFG.firebase) document.getElementById("privSignIn").hidden = false;
+if (CFG.donate && (CFG.donate.upi || CFG.donate.url)) document.getElementById("privDonate").hidden = false;
 // arriving from a game's About / Privacy link: jump to that section once the page is built
 if (location.hash) {const t = document.getElementById(location.hash.slice(1)); if (t) requestAnimationFrame(() => t.scrollIntoView({behavior:"instant"}));}
 

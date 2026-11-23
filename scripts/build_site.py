@@ -92,6 +92,7 @@ os.makedirs("player", exist_ok=True)
 with open("player/index.html", "w", encoding="utf-8") as f:
     f.write(html)
 shutil.copyfile("src/home.html", "index.html")
+shutil.copyfile("src/account.js", "account.js")   # shared account panel (code, always refreshed)
 if not os.path.exists("config.js"):   # keep your own settings once created
     shutil.copyfile("src/config.js", "config.js")
 print(f"{len(rows)} players, player/index.html {len(html)//1024} KB, home page index.html")
