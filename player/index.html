@@ -143,6 +143,13 @@ footer p{margin:0 0 6px}footer{margin-top:44px;padding-top:18px;border-top:1px s
 footer a,.guide a{color:inherit;text-decoration-color:var(--gold);text-underline-offset:3px}
 dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(540px,92vw);width:100%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .ib[hidden],.tb[hidden]{display:none}
+.result{margin-top:14px;padding:16px 4px 2px;border-top:1px solid rgb(217 174 91/.28)}
+.result[hidden]{display:none}
+.rhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.rhead b{font-size:22px;color:var(--gold-hi)}.rhead span{color:var(--chalk-2);font-size:14px}
+.result .reveal{margin:10px 0 14px;background:rgb(255 255 255/.04)}
+.ract{display:flex;gap:10px;flex-wrap:wrap}.result .btn.ghost{color:var(--chalk);border-color:rgb(255 255 255/.2)}
+.rnext{margin:12px 0 0;font-size:13.5px;color:var(--chalk-2)}.rnext b{color:var(--chalk)}
+.result textarea{width:100%;margin-top:10px;min-height:110px;border-radius:12px;border:1px solid rgb(255 255 255/.15);background:rgb(255 255 255/.05);color:var(--chalk);padding:10px}
 .bbar{display:flex;justify-content:flex-end;margin:-4px -2px 10px}
 .bt{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:500;color:var(--chalk-2,#a9b0d2);background:rgb(255 255 255/.05);
   border:1px solid rgb(217 174 91/.3);border-radius:999px;padding:5px 12px;min-height:32px;cursor:pointer}
@@ -211,7 +218,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
 /* collapsible guide sections: heading + down arrow, closed by default */
 details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;border-radius:12px}
 details.fold>summary::-webkit-details-marker{display:none}
-details.fold>summary h2{margin:0!important}
+details.fold>summary h2{margin:0!important;font-weight:400!important}
 details.fold>summary::after{content:"";flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9ae5b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .2s}
 details.fold[open]>summary::after{transform:rotate(180deg)}
 details.fold>summary:hover::after{border-color:var(--gold)}
@@ -261,6 +268,7 @@ details.fold[open]>summary{margin-bottom:14px}
       <div class="heads" aria-hidden="true"><span>Player</span><span><b class="full">Country</b><b class="short">Ctry</b></span><span>Role</span><span>Team</span><span>Age</span><span class="ex">Debut</span><span class="ex">Matches</span><span>Runs</span><span class="ex">Top score</span><span><b class="full">Wickets</b><b class="short">Wkts</b></span><span class="ex">Best bowling</span><span class="ex">Titles</span></div>
       <div id="rows"></div>
     </div></div>
+    <div class="result" id="result" aria-live="polite" hidden></div>
   </section>
   <p class="swipe">Swipe the board sideways to see every column. The player's name stays pinned on the left.</p>
   <div class="legend" aria-hidden="true">
@@ -594,6 +602,7 @@ function render(newest){
   const pips = `<span class="pips" aria-hidden="true">${Array.from({length:MAX}, (_, i) => `<i class="${i < guesses.length ? "used" : ""}"></i>`).join("")}</span>`;
   $("#left").innerHTML = done ? `<b style="color:var(--ink)">${won ? `Got it in ${guesses.length}` : "Out of guesses"}</b>` : `${pips}<span><b style="color:var(--ink)">${MAX - guesses.length}</b> left</span><span class="vh">${MAX - guesses.length} guesses left</span>`;
   $("#bPractice").hidden = mode === DAILY;
+  renderResult();
   $("#mode").innerHTML = practice ? (mode === DAILY ? "Practice" : `${MODES[mode].label}: practice game`)
     : play < DAY ? `<span class="archbar"><span>Archive: Player of the Day #${play + 1}, ${dateText(play)}</span><button type="button" id="bToday">Back to today</button></span>`
     : `Player of the Day #${DAY + 1}`;
@@ -641,7 +650,7 @@ function pick(p){
   if (p.id === answer.id) {done = true; won = true;}
   else if (guesses.length >= MAX) done = true;
   save(); render(true);
-  if (done) setTimeout(() => showStats(true), matchMedia("(prefers-reduced-motion: reduce)").matches ? 200 : 1100);
+  if (done) setTimeout(() => $("#result").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"nearest"}), matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : 1100);
   else $("#q").focus();
 }
 $("#q").addEventListener("input", search);
@@ -660,6 +669,25 @@ function shareText(){
   return `Wicketle ${practice ? `practice (${MODES[mode].label})` : "Player of the Day #" + (play + 1)} ${won ? guesses.length : "X"}/${MAX}\n${grid}${/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : ""}`;
 }
 function countdown(){const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const s = Math.floor((m - n) / 1000); return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m`;}
+function renderResult(){
+  const box = $("#result");
+  if (!done) {box.hidden = true; box.innerHTML = ""; return;}
+  const a = answer;
+  box.hidden = false;
+  box.innerHTML = `<div class="rhead"><b>${won ? "Well played!" : "Bowled out"}</b><span>${won ? `Got it in ${guesses.length} of ${MAX}` : "Out of guesses"}</span></div>
+    ${`<div class="reveal"><span>${won || play < DAY || practice ? "The player was" : "Today's player was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${CNAME[a.c] || a.c}, ${ROLE[a.r]}${a.age != null ? `, ${a.died ? "died aged " + a.age : "age " + a.age}` : ""}. ${a.m} matches for ${a.ts.join(", ")}. ${a.ru} runs, top score ${hsText(a)}. ${a.w} wickets${a.bw >= 0 ? `, best ${bbText(a)}` : ""}.</span></div>`}
+    <div class="ract"><button class="btn" id="rShare" type="button">Copy result</button>${mode !== DAILY ? `<button class="btn ghost" id="rNew" type="button">New player</button>` : `<button class="btn ghost" id="rStats" type="button">Your stats</button>`}</div>
+    ${mode === DAILY && !practice && play === DAY ? `<p class="rnext">Next Player of the Day in <b id="rNext">${countdown()}</b></p>` : ""}
+    <textarea id="rBox" hidden readonly aria-label="Result to copy"></textarea>`;
+  $("#rShare").onclick = async () => {
+    const t = shareText();
+    try {await navigator.clipboard.writeText(t); toast("Result copied");}
+    catch (e) {const b = $("#rBox"); b.value = t; b.hidden = false; b.select(); toast("Select and copy the text below");}
+  };
+  if ($("#rNew")) $("#rNew").onclick = () => startPractice();
+  if ($("#rStats")) $("#rStats").onclick = () => showStats(false);
+}
+setInterval(() => {const n = $("#rNext"); if (n) n.textContent = countdown();}, 30000);
 function showStats(withResult){
   const r = withResult && done, a = answer, stats = statsFor(DAILY);
   $("#resTitle").textContent = r ? (won ? "Well played" : "Bowled out") : "Daily puzzle statistics";
@@ -707,7 +735,7 @@ function applyMore(on){
 }
 applyMore(moreOn());
 $("#bMore").onclick = () => {const less = moreOn(); applyMore(!less); store.set("less", less); toast(less ? "Less stats on: 7 columns" : "All 12 columns shown");};
-$("#bStats").onclick = () => showStats(done);
+$("#bStats").onclick = () => showStats(false);
 $("#bPractice").onclick = () => startPractice();
 $("#modeMenu").innerHTML = Object.entries(MODES).map(([k, M]) => `<button type="button" role="menuitemradio" data-mode="${k}" aria-checked="false"><span class="dot" aria-hidden="true"></span><b>${M.label} <em class="mtag${k === DAILY ? " d" : ""}">${k === DAILY ? "Daily" : "Practice"}</em></b><small>${M.who} (${M.pool.length})</small></button>`).join("");
 const menu = $("#modeMenu"), mb = $("#bMode");
@@ -751,7 +779,7 @@ function drawArchive(){
   $("#archCal").querySelectorAll("button").forEach(b => b.onclick = () => {
     const d = +b.dataset.d; $("#dArch").close(); loadDay(d); render(false);
     toast(d === DAY ? "Today's Player of the Day" : `Player of the Day #${d + 1}, ${dateText(d)}`);
-    if (done) showStats(true); else $("#q").focus();
+    if (!done) $("#q").focus();
   });
 }
 $("#bArch").onclick = () => {drawArchive(); $("#dArch").showModal();};
@@ -847,7 +875,7 @@ if (FIREBASE_CONFIG) {
   $("#ruleSave").textContent = "Stats and streaks are saved on this device. Sign in with Google to keep them in your account and use them on other devices.";
 }
 
-if (mode === DAILY) {loadDaily(); render(false); if (done) showStats(true);}
+if (mode === DAILY) {loadDaily(); render(false);}
 else startPractice();
 if (CONTACT_EMAIL) {
   for (const [line, link] of [["#contactFoot", "#contactFootLink"]]) {

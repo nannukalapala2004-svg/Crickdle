@@ -110,6 +110,13 @@ button.slot.sel{outline:2px solid var(--gold);outline-offset:2px;background:rgb(
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .hint{color:var(--muted);font-size:13px;margin:8px 0 0}
+.result{margin-top:14px;padding:18px;border-radius:18px;background:var(--board);color:var(--chalk);border:1px solid rgb(217 174 91/.28)}
+.result.inboard{padding:16px 2px 2px;border:0;border-top:1px solid rgb(217 174 91/.28);border-radius:0;background:none}
+.rhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.rhead b{font-size:22px;color:var(--gold-hi)}.rhead span{color:var(--chalk-2);font-size:14px}
+.result .reveal{margin:10px 0 14px;background:rgb(255 255 255/.04);border:1px solid rgb(217 174 91/.2)}
+.result .btn.ghost{color:var(--chalk);border-color:rgb(255 255 255/.2)}
+.rnext{margin:12px 0 0;font-size:13.5px;color:var(--chalk-2)}.rnext b{color:var(--chalk)}
+.result textarea{background:rgb(255 255 255/.05);color:var(--chalk);border-color:rgb(255 255 255/.15)}
 
 /* dialog + toast */
 dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(520px,92vw);width:100%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
@@ -148,7 +155,7 @@ footer p{margin:0 0 6px}footer a{text-decoration-color:var(--gold);text-underlin
 /* collapsible guide sections: heading + down arrow, closed by default */
 details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;border-radius:12px}
 details.fold>summary::-webkit-details-marker{display:none}
-details.fold>summary h2{margin:0!important}
+details.fold>summary h2{margin:0!important;font-weight:400!important}
 details.fold>summary::after{content:"";flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9ae5b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .2s}
 details.fold[open]>summary::after{transform:rotate(180deg)}
 details.fold>summary:hover::after{border-color:var(--gold)}
@@ -195,6 +202,7 @@ details.fold[open]>summary{margin-bottom:14px}
     </div>
     <p class="left" id="gLeft"></p>
     <div class="guesses" id="gRows" aria-live="polite"></div>
+    <div class="result" id="gResult" aria-live="polite" hidden></div>
   </div>
 
   <!-- Build the path -->
@@ -202,6 +210,7 @@ details.fold[open]>summary{margin-bottom:14px}
     <section class="board" aria-label="Build the path">
       <div class="who" id="bWho"></div>
       <div class="rows" id="bRows"></div>
+      <div class="result inboard" id="bResult" aria-live="polite" hidden></div>
     </section>
     <p class="hint" id="bHint">Tap a slot, then pick the team he played for in those seasons.</p>
     <div class="picker" id="bPick" aria-label="Teams"></div>
@@ -375,7 +384,7 @@ function pickGuess(p){
   else if (s.rows.length >= GAME.guess.max) s.done = true;
   if (s.done) record("guess");
   save("guess"); render();
-  if (s.done) setTimeout(() => showRes(true), 500); else $("#q").focus();
+  if (s.done) reveal("#gResult"); else $("#q").focus();
 }
 $("#q").addEventListener("input", search);
 $("#q").addEventListener("keydown", e => {
@@ -440,7 +449,7 @@ $("#bCheck").onclick = () => {
   else if (s.rows.length >= GAME.build.max) s.done = true;
   if (s.done) record("build");
   save("build"); resetDraft(); render();
-  if (s.done) setTimeout(() => showRes(true), 500);
+  if (s.done) reveal("#bResult");
 };
 $("#bClear").onclick = () => {resetDraft(); draft = draft.map((t, i) => {const l = S.build.rows[S.build.rows.length - 1]; return l && l[i] === S.build.answer.path[i][0] ? t : null;}); cur = Math.max(0, draft.findIndex(t => !t)); renderBuild();};
 
@@ -453,7 +462,30 @@ function render(){
   $("#bPractice").setAttribute("aria-pressed", s.practice ? "true" : "false");
   $("#bPractice span").textContent = s.practice ? "Back to today" : "Practice";
   if (game === "guess") renderGuess(); else renderBuild();
+  renderResult();
 }
+function countdown(){const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const s = Math.floor((m - n) / 1000); return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m`;}
+// the result appears on the page, under the guesses, when a game ends (no pop-up)
+function renderResult(){
+  const s = S[game], a = s.answer, box = $(game === "guess" ? "#gResult" : "#bResult");
+  $("#gResult").hidden = $("#bResult").hidden = true;
+  if (!s.done) return;
+  box.hidden = false;
+  box.innerHTML = `<div class="rhead"><b>${s.won ? "Well played!" : "Bowled out"}</b><span>${s.won ? `Got it in ${s.rows.length} of ${GAME[game].max}` : "Out of tries"}</span></div>
+    <div class="reveal"><span>${game === "guess" ? "The player was" : "His path was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${a.path.map(([t, ys]) => `${t} ${yrs(ys)}`).join(" → ")}</span></div>
+    <div class="acts"><button class="btn" id="rShare" type="button">Copy result</button><button class="btn ghost" id="rNew" type="button">${s.practice ? "New practice player" : "Play practice"}</button>${s.practice ? "" : `<button class="btn ghost" id="rStats" type="button">Your stats</button>`}</div>
+    ${s.practice ? "" : `<p class="rnext">Next Career Path in <b class="rNext">${countdown()}</b></p>`}
+    <textarea id="rBox" hidden readonly aria-label="Result to copy"></textarea>`;
+  $("#rShare").onclick = async () => {
+    const t = shareText();
+    try {await navigator.clipboard.writeText(t); toast("Result copied");}
+    catch (e) {const b = $("#rBox"); b.value = t; b.hidden = false; b.select(); toast("Select and copy the text below");}
+  };
+  $("#rNew").onclick = () => practice(game);
+  if ($("#rStats")) $("#rStats").onclick = () => showRes(false);
+}
+setInterval(() => document.querySelectorAll(".rNext").forEach(n => n.textContent = countdown()), 30000);
+const reveal = id => setTimeout(() => $(id).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"nearest"}), 300);
 function shareText(){
   const s = S[game], E = {hit:"🟩", close:"🟨", miss:"🟥"};
   const head = `Wicketle Career Path ${s.practice ? "practice" : "#" + (DAY + 1)} (${GAME[game].label}) ${s.won ? s.rows.length : "X"}/${GAME[game].max}`;
@@ -485,7 +517,7 @@ document.querySelector(".tabs").addEventListener("keydown", e => {
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {const g = game === "guess" ? "build" : "guess"; setGame(g); $(g === "guess" ? "#tGuess" : "#tBuild").focus(); e.preventDefault();}
 });
 $("#bPractice").onclick = () => S[game].practice ? (load(game), render()) : practice(game);
-$("#bStats").onclick = () => showRes(S[game].done);
+$("#bStats").onclick = () => showRes(false);
 document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => b.closest("dialog").close());
 $("#dRes").addEventListener("click", e => {if (e.target === $("#dRes")) $("#dRes").close();});
 
@@ -498,7 +530,6 @@ try {if (JSON.parse(localStorage.getItem("crickdle:cb"))) root.classList.add("cb
 {const q = new URLSearchParams(location.search).get("game"); if (q === "guess" || q === "build") game = q;}
 
 load("guess"); load("build"); render();
-if (S[game].done) showRes(true);
 }
 
 // collapsible sections: open the one a link points to (e.g. the "?" button or the guide menu)
