@@ -142,7 +142,12 @@ td:first-child{font-weight:600;color:var(--ink)}
 footer p{margin:0 0 6px}footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 footer a,.guide a{color:inherit;text-decoration-color:var(--gold);text-underline-offset:3px}
 dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(540px,92vw);width:100%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.ib[hidden]{display:none}
+.ib[hidden],.tb[hidden]{display:none}
+.bbar{display:flex;justify-content:flex-end;margin:-4px -2px 10px}
+.bt{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:500;color:var(--chalk-2,#a9b0d2);background:rgb(255 255 255/.05);
+  border:1px solid rgb(217 174 91/.3);border-radius:999px;padding:5px 12px;min-height:32px;cursor:pointer}
+.bt svg{width:15px;height:15px}.bt:hover{border-color:var(--gold);color:var(--chalk)}
+.bt[aria-pressed=true]{color:var(--gold-ink);background:var(--gold);border-color:var(--gold)}
 .mtag{font-style:normal;font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:1px;color:var(--muted);border:1px solid var(--line)}
 .mtag.d{color:var(--gold-ink);background:var(--gold);border-color:var(--gold)}
 .dnote{margin:-4px 0 14px;color:var(--muted);font-size:14px}
@@ -197,7 +202,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
 @media(max-width:860px){html.more .grid{min-width:820px}.heads>span:first-child,.tile.nm{position:sticky;left:0;z-index:2}.heads>span:first-child{background:var(--board);opacity:1;align-self:stretch;display:flex;align-items:flex-end;box-shadow:0 0 0 6px var(--board)}.tile.nm{box-shadow:0 0 0 4px var(--board),12px 0 14px -8px rgb(0 0 0/.8)}.tile.nm.empty{background:#161c3b}.tile b{font-size:15px}html.more .swipe{display:block}}
 @media(max-width:480px){html:not(.more) .heads,html:not(.more) .tiles{grid-template-columns:minmax(0,2.1fr) repeat(6,minmax(0,1fr));gap:4px}html:not(.more) .tile b{font-size:12px;letter-spacing:-.02em}html:not(.more) .arr{font-size:.65em;margin-left:0}html:not(.more) .heads{font-size:10.5px}html:not(.more) .heads .full{display:none}html:not(.more) .heads .short{display:inline}.tile.nm{padding:0 7px}.tile.nm b{font-size:12px}}
 @media(max-width:600px){table{font-size:14px}.stack thead{display:none}.stack tr{display:grid;padding-block:12px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:6.5em;text-align:start;white-space:normal}.stack td::before{content:attr(data-l);float:inline-start;width:6em;margin-inline-start:-6.5em;color:var(--muted);font-weight:400}.stack td:first-child{padding-inline-start:0;font-size:16px}.stack td:first-child::before{display:none}.modes-t.stack td{text-align:start}
-  .toolbar{align-items:stretch}.chips{width:100%}.chips .tb{flex:1;justify-content:center}}
+  .toolbar{align-items:center}.chips{margin-left:auto}.chips .tb{justify-content:center}}
 @media(max-width:480px){.chips .tb{font-size:13px;padding:8px 10px;gap:6px;white-space:nowrap}.chips{gap:6px}}
 @media(max-width:380px){.mark h1{font-size:22px}.icons{gap:4px}.ib{width:36px!important;height:36px!important}.ib svg{width:18px;height:18px}}
 @media(max-width:480px){.mark h1{font-size:25px}.ball{width:30px;height:30px}.icons{gap:6px}.ib{width:40px;height:40px}.board{padding:12px 8px 14px;border-radius:18px}.tile{border-radius:8px}.guide h2{font-size:24px}}
@@ -231,8 +236,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
     </div>
     <div class="chips">
       <button class="tb" id="bArch" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Archive</button>
-      <button class="tb" id="bPractice" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span class="pl">Practice</span></button>
-      <button class="tb" id="bMore" type="button" aria-pressed="false" title="Hide Debut, Matches, Top score, Best bowling and Titles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/></svg>Less stats</button>
+      <button class="tb" id="bPractice" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span class="pl">New player</span></button>
     </div>
   </div>
   <div class="sub"><div><span id="mode"></span><p class="modenote" id="modeNote"></p></div><div class="left" id="left"></div></div>
@@ -242,6 +246,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
     <ul id="list" role="listbox" aria-label="Matching players"></ul>
   </div>
   <section class="board" aria-label="Your guesses">
+    <div class="bbar"><button class="bt" id="bMore" type="button" aria-pressed="false" title="Hide Debut, Matches, Top score, Best bowling and Titles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/></svg>Less stats</button></div>
     <div class="bscroll"><div class="grid">
       <div class="heads" aria-hidden="true"><span>Player</span><span><b class="full">Country</b><b class="short">Ctry</b></span><span>Role</span><span>Team</span><span>Age</span><span class="ex">Debut</span><span class="ex">Matches</span><span>Runs</span><span class="ex">Top score</span><span><b class="full">Wickets</b><b class="short">Wkts</b></span><span class="ex">Best bowling</span><span class="ex">Titles</span></div>
       <div id="rows"></div>
@@ -284,17 +289,17 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li><b>Type at least two letters</b> of any IPL player's name, first name or surname, in the search box.</li>
         <li><b>Choose a player</b> from the list by tapping it, or with the arrow keys and Enter.</li>
         <li><b>Read the row.</b> Twelve tiles light up green, yellow or red under the column names at the top of the board, comparing your guess with the hidden player. On a phone, swipe the board sideways to see every column.</li>
-        <li><b>Want a simpler board?</b> Press <b>Less stats</b> above the search box to hide Debut, Matches, Top score, Best bowling and Titles, leaving seven tiles that fit a phone without swiping. Press it again to bring them back.</li>
+        <li><b>Want a simpler board?</b> Press <b>Less stats</b> at the top right of the board to hide Debut, Matches, Top score, Best bowling and Titles, leaving seven tiles that fit a phone without swiping. Press it again to bring them back.</li>
         <li><b>Follow the arrows</b> on number tiles to go higher or lower with your next guess.</li>
         <li><b>Keep guessing</b> until the Player tile turns green. You have 8 guesses.</li>
         <li><b>Share your result</b> with Copy result. It copies a spoiler-free grid of coloured squares.</li>
-        <li><b>Come back tomorrow.</b> A new player arrives at midnight your local time. Want more now? Press Practice for unlimited random games.</li>
+        <li><b>Come back tomorrow.</b> A new player arrives at midnight your local time. Want more now? Pick Medium, Hard, Spot the Star or 2026 season from the Mode menu for unlimited random games.</li>
       </ol>
     </section>
 
     <section id="attributes">
       <h2>What each attribute means</h2>
-      <p>Every number covers IPL matches only, from 2008 to the 2026 final. Columns marked “extra” are hidden when the Less stats switch above the search box is on.</p>
+      <p>Every number covers IPL matches only, from 2008 to the 2026 final. Columns marked “extra” are hidden when the Less stats switch at the top right of the board is on.</p>
       <table class="stack">
         <thead><tr><th>Attribute</th><th>What it shows</th><th>Yellow when</th></tr></thead>
         <tbody>
@@ -338,7 +343,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li><b>Make every guess work.</b> Pick a player who could be the answer and also tests something new, rather than repeating what you already know.</li>
         <li><b>Halve the range.</b> If Runs says ▲ from 1,000 and ▼ from 5,000, aim near 3,000 next.</li>
         <li><b>Trust the reds.</b> A red value is ruled out completely, so don't guess another player with it.</li>
-        <li><b>Use Practice to learn the numbers.</b> Random games build a feel for who has how many runs and wickets.</li>
+        <li><b>Use the practice modes to learn the numbers.</b> Random games build a feel for who has how many runs and wickets.</li>
         <li><b>Play daily for your streak.</b> Your streak grows with every daily puzzle you solve on its day.</li>
       </ul>
     </section>
@@ -592,7 +597,7 @@ function render(newest){
   if (newest) setTimeout(() => document.querySelectorAll(".row.new").forEach(r => r.classList.remove("new")), 1700);
   const pips = `<span class="pips" aria-hidden="true">${Array.from({length:MAX}, (_, i) => `<i class="${i < guesses.length ? "used" : ""}"></i>`).join("")}</span>`;
   $("#left").innerHTML = done ? `<b style="color:var(--ink)">${won ? `Got it in ${guesses.length}` : "Out of guesses"}</b>` : `${pips}<span><b style="color:var(--ink)">${MAX - guesses.length}</b> left</span><span class="vh">${MAX - guesses.length} guesses left</span>`;
-  const pl = $("#bPractice .pl"); if (pl) pl.textContent = mode === DAILY ? "Practice" : "New player";
+  $("#bPractice").hidden = mode === DAILY;
   $("#mode").innerHTML = practice ? (mode === DAILY ? "Practice: a random Normal player" : `${MODES[mode].label}: practice game`)
     : play < DAY ? `<span class="archbar"><span>Archive: Player of the Day #${play + 1}, ${dateText(play)}</span><button type="button" id="bToday">Back to today</button></span>`
     : `Player of the Day #${DAY + 1}`;
@@ -602,7 +607,7 @@ function render(newest){
   $("#bMode").setAttribute("aria-label", `Game mode: ${MODES[mode].label}. Change mode`);
   document.querySelectorAll("#modeMenu button").forEach(b => b.setAttribute("aria-checked", b.dataset.mode === mode ? "true" : "false"));
   $("#q").disabled = done;
-  $("#q").placeholder = done ? "Finished. Try another mode or play Practice" : "Type a player's name";
+  $("#q").placeholder = done ? (mode === DAILY ? "Finished. A new player arrives at midnight" : "Finished. Press New player for another") : "Type a player's name";
 }
 
 let hits = [], sel = -1;
@@ -667,7 +672,7 @@ function showStats(withResult){
   $("#statNums").innerHTML = [[stats.played, "Played"], [pct, "Win %"], [stats.streak, "Streak"], [stats.best, "Best streak"]].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("");
   const top = Math.max(1, ...stats.dist);
   $("#dist").innerHTML = `<p style="margin:0 0 4px;font-weight:700">Guesses to win (daily puzzles)</p>` + stats.dist.map((v, i) => `<div><span style="width:1em">${i + 1}</span><i class="${r && won && !practice && guesses.length === i + 1 && play === DAY ? "me" : ""}" style="width:${Math.max(8, v / top * 100)}%">${v}</i></div>`).join("");
-  $("#resActs").innerHTML = (r ? `<button class="btn" id="bShare" type="button">Copy result</button>` : "") + `<button class="btn ghost" id="bNew" type="button">${practice ? "New player" : "Play practice"}</button>`;
+  $("#resActs").innerHTML = (r ? `<button class="btn" id="bShare" type="button">Copy result</button>` : "") + (mode !== DAILY ? `<button class="btn ghost" id="bNew" type="button">New player</button>` : "");
   $("#shareBox").hidden = true;
   const bs = $("#bShare");
   if (bs) bs.onclick = async () => {
@@ -675,7 +680,7 @@ function showStats(withResult){
     try {await navigator.clipboard.writeText(t); toast("Result copied");}
     catch (e) {const b = $("#shareBox"); b.value = t; b.hidden = false; b.select(); toast("Select and copy the text below");}
   };
-  $("#bNew").onclick = () => {$("#dStats").close(); startPractice();};
+  if ($("#bNew")) $("#bNew").onclick = () => {$("#dStats").close(); startPractice();};
   if (!$("#dStats").open) $("#dStats").showModal();
 }
 function startPractice(){
@@ -707,7 +712,7 @@ function applyMore(on){
 applyMore(moreOn());
 $("#bMore").onclick = () => {const less = moreOn(); applyMore(!less); store.set("less", less); toast(less ? "Less stats on: 7 columns" : "All 12 columns shown");};
 $("#bStats").onclick = () => showStats(done);
-$("#bPractice").onclick = () => mode !== DAILY ? startPractice() : practice ? (loadDaily(), render(false)) : startPractice();
+$("#bPractice").onclick = () => startPractice();
 $("#modeMenu").innerHTML = Object.entries(MODES).map(([k, M]) => `<button type="button" role="menuitemradio" data-mode="${k}" aria-checked="false"><span class="dot" aria-hidden="true"></span><b>${M.label} <em class="mtag${k === DAILY ? " d" : ""}">${k === DAILY ? "Daily" : "Practice"}</em></b><small>${M.who} (${M.pool.length})</small></button>`).join("");
 const menu = $("#modeMenu"), mb = $("#bMode");
 function openMenu(open){
