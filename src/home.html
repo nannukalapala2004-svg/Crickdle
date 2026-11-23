@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crickdle – daily cricket puzzles</title>
+<meta name="description" content="Free daily cricket puzzles. Guess the IPL player in 8 tries, with a new puzzle every day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}</script>
+<style>
+/* Home page: same night-match look as the game (midnight navy, porcelain, one gold).
+   Each game is a navy "board" card; the coloured tile row is the house motif. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#f6f7fb,#090d20);--ink:light-dark(#0b1030,#eef0fa);--muted:light-dark(#5b6283,#9aa2c6);
+  --surface:light-dark(#ffffff,#111735);--line:light-dark(#dfe2ee,rgb(255 255 255/.08));
+  --board:#0f1534;--chalk:#eef0fa;--chalk-2:#a9b0d2;--slot:rgb(255 255 255/.05);
+  --gold:#d9ae5b;--gold-hi:#f3d48a;--gold-lo:#b8862d;--gold-ink:#2a1d05;
+  --hit:#1fa463;--close:#f2c14e;--miss:#c9343c;
+  --shadow:light-dark(0 24px 60px -30px rgb(11 16 48/.45),0 30px 70px -30px rgb(0 0 0/.8))}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--ink);background:var(--bg);font:15px/1.6 Poppins,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:940px;margin:0 auto;padding:22px max(4vw,14px) 48px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none}
+.ball{width:34px;height:34px;filter:drop-shadow(0 6px 14px rgb(200 30 50/.35))}
+.mark b{font-size:27px;font-weight:700;letter-spacing:-.02em}
+.mark b span{background:linear-gradient(180deg,var(--gold-hi),var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ib{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink)}
+.ib svg{width:20px;height:20px}.ib .sun{display:none}
+:root[data-theme=dark] .ib .moon{display:none}:root[data-theme=dark] .ib .sun{display:block}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ib .moon{display:none}:root:not([data-theme=light]) .ib .sun{display:block}}
+
+.intro{margin:40px 0 26px}
+.intro h1{margin:0;font-size:clamp(30px,5.4vw,46px);line-height:1.1;font-weight:700;letter-spacing:-.025em}
+.intro p{margin:10px 0 0;color:var(--muted);font-size:16px;max-width:52ch}
+
+.games{display:grid;gap:18px}
+.game{position:relative;display:grid;grid-template-columns:1.15fr 1fr;gap:26px;padding:28px;border-radius:22px;
+  background:var(--board);color:var(--chalk);border:1px solid rgb(217 174 91/.28);box-shadow:var(--shadow)}
+.game h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.015em}
+.game .tag{display:inline-block;margin-bottom:10px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;color:var(--gold-hi);background:rgb(217 174 91/.12);border:1px solid rgb(217 174 91/.3)}
+.game p{margin:8px 0 0;color:var(--chalk-2);max-width:42ch}
+.tiles{display:flex;gap:6px;margin:20px 0 22px}
+.tiles i{width:34px;height:34px;border-radius:8px;display:block}
+.tiles .h{background:var(--hit)}.tiles .c{background:var(--close)}.tiles .m{background:var(--miss)}.tiles .e{background:var(--slot);outline:1px solid rgb(255 255 255/.07)}
+.play{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:14px;font-weight:600;text-decoration:none;
+  color:var(--gold-ink);background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 10px 26px -12px rgb(217 174 91/.7)}
+.play:hover{filter:brightness(1.05)}
+.today{margin:14px 0 0;font-size:13px;color:var(--chalk-2)}
+.today strong{color:var(--chalk);font-weight:600}
+
+.modes ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.modes h3{margin:0 0 4px;font-size:13px;font-weight:600;color:var(--chalk-2)}
+.modes a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;border-radius:12px;
+  text-decoration:none;background:var(--slot);border:1px solid rgb(255 255 255/.06)}
+.modes a:hover{border-color:rgb(217 174 91/.45)}
+.modes .nm{font-weight:600;font-size:14.5px;line-height:1.3}
+.modes small{display:block;font-size:12px;color:var(--chalk-2);line-height:1.35}
+.st{flex:none;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.st.new{color:var(--gold-hi);background:rgb(217 174 91/.12)}
+.st.won{color:#fff;background:var(--hit)}.st.lost{color:#fff;background:var(--miss)}.st.on{color:#2b1f00;background:var(--close)}
+
+.soon{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:22px;border:1.5px dashed light-dark(#c9cde0,rgb(255 255 255/.14));color:var(--muted)}
+.soon svg{width:40px;height:40px;flex:none;color:var(--gold)}
+.soon h2{margin:0;font-size:17px;color:var(--ink);font-weight:600}
+.soon p{margin:2px 0 0;font-size:14px}
+
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin:0 0 6px}
+footer a{text-decoration-color:var(--gold);text-underline-offset:3px}
+
+@media(max-width:720px){
+  .game{grid-template-columns:1fr;padding:22px 18px;gap:20px}
+  .tiles i{width:30px;height:30px}
+  .play{width:100%;justify-content:center}
+  .intro{margin:28px 0 20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="mark" href="./" aria-label="Crickdle home">
+      <svg class="ball" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="bg1" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e2384a"/><stop offset="1" stop-color="#7d0f1d"/></radialGradient><linearGradient id="gs" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3d48a"/><stop offset="1" stop-color="#b8862d"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#bg1)"/><path d="M9.5 4.2c3.8 6.3 3.8 17.3 0 23.6M22.5 4.2c-3.8 6.3-3.8 17.3 0 23.6" fill="none" stroke="url(#gs)" stroke-width="1.5" stroke-dasharray="1.6 1.8"/><ellipse cx="11.5" cy="10" rx="4.5" ry="3" fill="#fff" opacity=".18"/></svg>
+      <b>Crick<span>dle</span></b>
+    </a>
+    <button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+  </header>
+
+  <main>
+    <div class="intro">
+      <h1>Daily cricket puzzles</h1>
+      <p>A new puzzle every day. Free to play, no sign-up.</p>
+    </div>
+
+    <div class="games" id="games"></div>
+  </main>
+
+  <footer>
+    <p>Crickdle is an unofficial fan project, not affiliated with the IPL, the BCCI or any team.</p>
+    <p>Match data from <a href="https://cricsheet.org" rel="noopener">Cricsheet</a>, used under the <a href="https://opendatacommons.org/licenses/by/1-0/" rel="noopener">ODC Attribution License</a>, and modified. No accounts, ads or cookies: your progress stays in your browser.</p>
+  </footer>
+</div>
+
+<script>
+{
+/* ---------- Add new games here ----------
+   Each game gets a card. "modes" is optional; "status" reads that game's saved progress for today.
+   For a game that isn't ready yet, leave it out: the "more games" card is always shown last. */
+const EPOCH = Date.UTC(2026, 10, 23);
+const n = new Date();
+const DAY = Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 864e5);
+const get = k => {try{const v = localStorage.getItem("crickdle:" + k); return v ? JSON.parse(v) : null;}catch(e){return null;}};
+
+const GAMES = [
+  {
+    id: "player",
+    href: "player/",
+    tag: "Daily",
+    title: "Guess the Player",
+    blurb: "Guess the IPL player in 8 tries. Every guess shows how close you are on country, role, team, age and career stats.",
+    tiles: "hcmmhce",
+    puzzle: DAY + 1,
+    modes: [
+      ["normal", "Normal", "Players with 50+ IPL matches"],
+      ["medium", "Medium", "Players with 20+ IPL matches"],
+      ["hard", "Hard", "All 809 IPL players"],
+      ["decade", "This decade", "Played from 2020 onwards"],
+      ["season", "2026 season", "Played in IPL 2026"]
+    ],
+    status(mode){
+      const s = get("day:" + mode);
+      if (!s || s.day !== DAY || !s.g || !s.g.length) return ["new", "New"];
+      if (s.done) return s.won ? ["won", "Solved in " + s.g.length] : ["lost", "Missed"];
+      return ["on", s.g.length + "/8 guesses"];
+    },
+    streak(mode){
+      const s = get("stats:" + mode);
+      return s && s.last != null && s.last >= DAY - 1 ? s.streak : 0;
+    }
+  }
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let html = "";
+for (const g of GAMES) {
+  const tiles = [...g.tiles].map(t => `<i class="${t}"></i>`).join("");
+  let modes = "", solved = 0, best = 0;
+  if (g.modes) {
+    modes = `<div class="modes"><h3>Pick a mode</h3><ul>` + g.modes.map(([k, name, who]) => {
+      const [cls, txt] = g.status(k);
+      if (cls === "won" || cls === "lost") solved++;
+      best = Math.max(best, g.streak(k));
+      return `<li><a href="${g.href}?mode=${k}"><span><span class="nm">${esc(name)}</span><small>${esc(who)}</small></span><span class="st ${cls}">${txt}</span></a></li>`;
+    }).join("") + `</ul></div>`;
+  }
+  const today = g.modes
+    ? `Puzzle #${g.puzzle}: <strong>${solved} of ${g.modes.length}</strong> modes finished today` + (best ? `. Best current streak: <strong>${best}</strong>` : "")
+    : "";
+  html += `<article class="game" aria-labelledby="t-${g.id}">
+    <div>
+      <span class="tag">${esc(g.tag)}</span>
+      <h2 id="t-${g.id}">${esc(g.title)}</h2>
+      <p>${esc(g.blurb)}</p>
+      <div class="tiles" aria-hidden="true">${tiles}</div>
+      <a class="play" href="${g.href}">Play today's puzzle</a>
+      ${today ? `<p class="today">${today}</p>` : ""}
+    </div>
+    ${modes}
+  </article>`;
+}
+html += `<section class="soon">
+  <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="14" height="14" rx="3"/><rect x="22" y="4" width="14" height="14" rx="3"/><rect x="4" y="22" width="14" height="14" rx="3"/><path d="M29 23v12M23 29h12"/></svg>
+  <div><h2>More games are on the way</h2><p>New daily cricket puzzles will appear here.</p></div>
+</section>`;
+document.getElementById("games").innerHTML = html;
+
+const root = document.documentElement, btn = document.getElementById("bTheme");
+const sys = matchMedia("(prefers-color-scheme: dark)");
+const cur = () => root.dataset.theme || (sys.matches ? "dark" : "light");
+const apply = t => {root.dataset.theme = t; btn.setAttribute("aria-pressed", t === "dark" ? "true" : "false");};
+apply(cur());
+btn.addEventListener("click", () => {const t = cur() === "dark" ? "light" : "dark"; apply(t); try{localStorage.setItem("crickdle:theme", JSON.stringify(t));}catch(e){}});
+}
+</script>
+</body>
+</html>

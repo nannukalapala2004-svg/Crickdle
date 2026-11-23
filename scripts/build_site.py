@@ -2,7 +2,7 @@
 
 Usage: python3 build_site.py   (run from the project root)
 Reads data/stats.json, data/meta.tsv, src/template.html
-Writes data/players.json and index.html
+Writes data/players.json, player/index.html (the game) and index.html (the home page)
 """
 import json
 import os
@@ -62,6 +62,9 @@ with open("data/players.json", "w", encoding="utf-8") as f:
     json.dump(rows, f, ensure_ascii=False, separators=(",", ":"))
 data = json.dumps(rows, ensure_ascii=False, separators=(",", ":"))
 html = open("src/template.html", encoding="utf-8").read().replace("/*__DATA__*/[]", data)
-with open("index.html", "w", encoding="utf-8") as f:
+import os, shutil
+os.makedirs("player", exist_ok=True)
+with open("player/index.html", "w", encoding="utf-8") as f:
     f.write(html)
-print(f"{len(rows)} players, index.html {len(html)//1024} KB")
+shutil.copyfile("src/home.html", "index.html")
+print(f"{len(rows)} players, player/index.html {len(html)//1024} KB, home page index.html")

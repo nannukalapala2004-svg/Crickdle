@@ -64,3 +64,8 @@ Match data comes from [Cricsheet](https://cricsheet.org), released under the Ope
 - The About section and the footer credit Cricsheet (ODC-By) and the IPL-DATASET mirror (MIT), and state that Crickdle is unofficial and not affiliated with the IPL, BCCI or any team. Keep these when you change the page.
 - Birth dates flagged `?` in `data/dob_curated.tsv` are skipped by the build, so those players show a "?" age. To restore one, put a confirmed date in `dob_verified.tsv`.
 - Country flags are simplified inline SVG drawings (the `FLAG` map in the template). A new country needs a new entry there, or it shows the code without a flag.
+
+## Site layout
+- `index.html` is the home page (copied from `src/home.html`). It lists the games and shows today's progress for each mode.
+- `player/index.html` is the Guess the Player game (built from `src/template.html`). It links back to the home page with the logo and the grid icon, and accepts `?mode=normal|medium|hard|decade|season`.
+- To add a game: put it in its own folder (for example `scorecard/index.html`) and add an entry to the `GAMES` list near the top of the script in `src/home.html`. Keep localStorage keys under `crickdle:` with a prefix of your own for the new game.
