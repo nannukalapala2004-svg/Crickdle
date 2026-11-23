@@ -189,7 +189,9 @@ const GAMES = [
   }
 ];
 
-const TC = {KKR:["#3a225d","#b3a123"], RCB:["#ec1c24","#2b2a29","#d4af37"], PBKS:["#dd1f2d","#a7a9ac"]};
+// kit colours with share of the kit (percent), as in Career Path
+const TC = {KKR:[["#3a225d",80],["#b3a123",20]], RCB:[["#ec1c24",55],["#2b2a29",35],["#d4af37",10]], PBKS:[["#dd1f2d",80],["#a7a9ac",20]]};
+const kit = t => {let at = 0; return `linear-gradient(90deg,${TC[t].map(([c, w]) => `${c} ${at}% ${at += w}%`).join(",")})`;};
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let html = "";
 for (const g of GAMES) {
@@ -197,7 +199,7 @@ for (const g of GAMES) {
     ? `<div class="tiles" aria-hidden="true">${g.board.map(r => `<div>${[...r].map(t => `<i class="${t}"></i>`).join("")}</div>`).join("")}</div>`
     : g.over
     ? `<div class="mover" aria-hidden="true"><ol>${g.over.map(r => `<li class="r${r}">${r || "•"}</li>`).join("")}</ol><p>${g.over.reduce((a, b) => a + b, 0)} runs</p></div>`
-    : `<ol class="mpath" aria-hidden="true">${g.path.map(([y, t]) => `<li><span>${y}</span><b style="border-left:5px solid ${TC[t][0]}"><i style="background:linear-gradient(90deg,${TC[t].map((c, i, a) => `${c} ${i * 100 / a.length}% ${(i + 1) * 100 / a.length}%`).join(",")})"></i>${t}</b></li>`).join("")}</ol>`;
+    : `<ol class="mpath" aria-hidden="true">${g.path.map(([y, t]) => `<li><span>${y}</span><b style="border-left:5px solid ${TC[t][0][0]}"><i style="background:${kit(t)}"></i>${t}</b></li>`).join("")}</ol>`;
   html += `<article class="game" aria-labelledby="t-${g.id}">
     <div>
       <span class="tag">${esc(g.tag)}</span>

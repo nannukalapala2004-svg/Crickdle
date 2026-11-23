@@ -262,10 +262,26 @@ const RAW = {"players":[["ba607b88","Virat Kohli","V Kohli","IND","BAT",282,9336
 const $ = s => document.querySelector(s);
 const TEAM = {CSK:"Chennai Super Kings", DC:"Delhi Capitals", DCH:"Deccan Chargers", GL:"Gujarat Lions", GT:"Gujarat Titans", KKR:"Kolkata Knight Riders", KTK:"Kochi Tuskers Kerala", LSG:"Lucknow Super Giants", MI:"Mumbai Indians", PBKS:"Punjab Kings", PWI:"Pune Warriors", RCB:"Royal Challengers Bengaluru", RPS:"Rising Pune Supergiant", RR:"Rajasthan Royals", SRH:"Sunrisers Hyderabad"};
 // franchise colours (2-3 each) so teams are easy to spot at a glance
-const TC = {CSK:["#f9cd05","#0081e9"], MI:["#004ba0","#d1ab3e"], RCB:["#ec1c24","#2b2a29","#d4af37"], KKR:["#3a225d","#b3a123"],
-  SRH:["#ff822a","#111111"], RR:["#ea1a85","#254aa5"], DC:["#17479e","#ef1b23"], PBKS:["#dd1f2d","#a7a9ac"], LSG:["#0057e2","#a72056","#f28b00"],
-  GT:["#1b2133","#b5985a"], DCH:["#2a3e6c","#c0c0c0","#d4af37"], GL:["#e04f16","#f6b219"], RPS:["#6a2c91","#d11d9b"], PWI:["#1ea5dc","#111111"], KTK:["#f15a22","#6b1f7a"]};
-const stripes = t => {const c = TC[t] || ["#888"], w = 100 / c.length; return `linear-gradient(90deg,${c.map((x, i) => `${x} ${i * w}% ${(i + 1) * w}%`).join(",")})`;};
+// franchise kit colours with roughly how much of the kit each covers (percent), main colour first
+const TC = {
+  CSK:[["#f9cd05",75],["#0081e9",25]],             // yellow shirt, blue trim
+  MI:[["#004ba0",80],["#d1ab3e",20]],              // blue shirt, gold trim
+  RCB:[["#ec1c24",55],["#2b2a29",35],["#d4af37",10]], // red and black, gold detail
+  KKR:[["#3a225d",80],["#b3a123",20]],             // purple shirt, gold trim
+  SRH:[["#ff822a",70],["#111111",30]],             // orange shirt, black panels
+  RR:[["#ea1a85",60],["#254aa5",40]],              // pink and royal blue
+  DC:[["#17479e",70],["#ef1b23",30]],              // blue shirt, red trim
+  PBKS:[["#dd1f2d",80],["#a7a9ac",20]],            // red shirt, silver trim
+  LSG:[["#0057e2",65],["#a72056",20],["#f28b00",15]], // blue shirt, maroon and orange
+  GT:[["#1b2133",80],["#b5985a",20]],              // navy shirt, gold trim
+  DCH:[["#2a3e6c",60],["#c0c0c0",30],["#d4af37",10]], // navy, silver, gold
+  GL:[["#e04f16",75],["#f6b219",25]],              // orange shirt, gold trim
+  RPS:[["#6a2c91",70],["#d11d9b",30]],             // purple shirt, pink trim
+  PWI:[["#1ea5dc",80],["#111111",20]],             // sky blue shirt, black trim
+  KTK:[["#f15a22",60],["#6b1f7a",40]]              // orange and purple
+};
+const main = t => (TC[t] || [["#888", 100]])[0][0];
+const stripes = t => {let at = 0; return `linear-gradient(90deg,${(TC[t] || [["#888", 100]]).map(([c, w]) => `${c} ${at}% ${at += w}%`).join(",")})`;};
 const sw = (t, cls = "sw") => `<i class="${cls}" style="background:${stripes(t)}" aria-hidden="true"></i>`;
 const ROLE = {BAT:"Batter", BOWL:"Bowler", AR:"All-rounder", WK:"Wicketkeeper"};
 const CNAME = {IND:"India", AUS:"Australia", NZ:"New Zealand", ENG:"England", SA:"South Africa", WI:"West Indies", SL:"Sri Lanka", PAK:"Pakistan", AFG:"Afghanistan", BAN:"Bangladesh", ZIM:"Zimbabwe", NEP:"Nepal", NED:"Netherlands", KEN:"Kenya", IRE:"Ireland"};
@@ -357,7 +373,7 @@ function colourPath(guess, ans){
 }
 function renderGuess(){
   const s = S.guess, a = s.answer;
-  $("#gPath").innerHTML = a.path.map(([t, ys]) => `<li><span class="yr">${yrs(ys)}</span><span class="chip" style="border-left:5px solid ${(TC[t] || ["#888"])[0]}">${sw(t)}<b>${t}</b><span>${TEAM[t] || t}</span></span></li>`).join("");
+  $("#gPath").innerHTML = a.path.map(([t, ys]) => `<li><span class="yr">${yrs(ys)}</span><span class="chip" style="border-left:5px solid ${main(t)}">${sw(t)}<b>${t}</b><span>${TEAM[t] || t}</span></span></li>`).join("");
   const wrong = s.rows.filter(id => id !== a.id).length, open = s.done ? CLUES.length : wrong;
   $("#gClues").innerHTML = CLUES.map(([label, f], i) => i < open
     ? `<div class="clue on">${label}<b>${f(a)}</b></div>`
