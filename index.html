@@ -130,7 +130,7 @@ for (const g of GAMES) {
       <h2 id="t-${g.id}">${esc(g.title)}</h2>
       <p>${esc(g.blurb)}</p>
       <a class="play" href="${g.href}">Play today's puzzle</a>
-      <p class="today">Puzzle #${DAY + 1}. A new player every day at midnight.</p>
+      <p class="today">Puzzle #${DAY + 1}. New player every day at <strong>12:00 AM</strong> your time. Next one in <strong class="next"></strong>.</p>
     </div>
     <div class="tiles" aria-hidden="true">${board}</div>
   </article>`;
@@ -140,6 +140,15 @@ html += `<section class="soon">
   <div><h2>More games are on the way</h2><p>New daily cricket puzzles will appear here.</p></div>
 </section>`;
 document.getElementById("games").innerHTML = html;
+
+// countdown to the next puzzle (local midnight); reload the page when the day changes
+function tick(){
+  const now = new Date(), mid = new Date(now); mid.setHours(24, 0, 0, 0);
+  const m = Math.ceil((mid - now) / 6e4), h = Math.floor(m / 60);
+  for (const el of document.querySelectorAll(".next")) el.textContent = h ? `${h}h ${m % 60}m` : `${m}m`;
+  if (Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - EPOCH) / 864e5) !== DAY) location.reload();
+}
+tick(); setInterval(tick, 15000);
 
 const root = document.documentElement, btn = document.getElementById("bTheme");
 const sys = matchMedia("(prefers-color-scheme: dark)");
