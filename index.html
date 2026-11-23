@@ -13,12 +13,12 @@
 /* Home page: same night-match look as the game (midnight navy, porcelain, one gold).
    Each game is a navy "board" card; the coloured tile row is the house motif. */
 :root{color-scheme:light dark;
-  --bg:light-dark(#f6f7fb,#090d20);--ink:light-dark(#0b1030,#eef0fa);--muted:light-dark(#5b6283,#9aa2c6);
-  --surface:light-dark(#ffffff,#111735);--line:light-dark(#dfe2ee,rgb(255 255 255/.08));
+  --bg:#f6f7fb;--ink:#0b1030;--muted:#5b6283;
+  --surface:#ffffff;--line:#dfe2ee;
   --board:#0f1534;--chalk:#eef0fa;--chalk-2:#a9b0d2;--slot:rgb(255 255 255/.05);
   --gold:#d9ae5b;--gold-hi:#f3d48a;--gold-lo:#b8862d;--gold-ink:#2a1d05;
   --hit:#1fa463;--close:#f2c14e;--miss:#c9343c;
-  --shadow:light-dark(0 24px 60px -30px rgb(11 16 48/.45),0 30px 70px -30px rgb(0 0 0/.8))}
+  --shadow:0 24px 60px -30px rgb(11 16 48/.45)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 html{scroll-behavior:smooth}
 *{box-sizing:border-box;min-width:0}
@@ -71,14 +71,14 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .mover li{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--hit)}
 .mover li.r0{background:var(--miss)}.mover li.r6{background:var(--gold);color:var(--gold-ink)}.mover li.r4{background:#2f80ed}
 .mover p{margin:12px 0 0;font-size:30px;font-weight:700;color:var(--gold-hi);line-height:1}
-.soon{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:22px;border:1.5px dashed light-dark(#c9cde0,rgb(255 255 255/.14));color:var(--muted)}
+.soon{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:22px;border:1.5px dashed var(--ld1);color:var(--muted)}
 .soon svg{width:40px;height:40px;flex:none;color:var(--gold)}
 .soon h2{margin:0;font-size:17px;color:var(--ink);font-weight:600}
 .soon p{margin:2px 0 0;font-size:14px}
 
 .info section{padding:18px 0;border-top:1px solid var(--line);scroll-margin-top:16px}.info section:first-child{margin-top:40px}
 .info h2{margin:0 0 12px;font-size:24px;font-weight:700;letter-spacing:-.02em}
-.info p{max-width:66ch;color:light-dark(#2a3050,#c9cde4);margin:0 0 12px}
+.info p{max-width:66ch;color:var(--ld2);margin:0 0 12px}
 .info a{text-decoration-color:var(--gold);text-underline-offset:3px}
 footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 footer p{margin:0 0 6px}
@@ -102,6 +102,11 @@ details.fold[open]>summary::after{transform:rotate(180deg)}
 details.fold>summary:hover::after{border-color:var(--gold)}
 details.fold>summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 details.fold[open]>summary{margin-bottom:14px}
+
+/* dark mode values (plain variables, no light-dark(), so older browsers work) */
+:root{--ld1:#c9cde0;--ld2:#2a3050}
+:root[data-theme=dark]{--bg:#090d20;--ink:#eef0fa;--muted:#9aa2c6;--surface:#111735;--line:rgb(255 255 255/.08);--shadow:0 30px 70px -30px rgb(0 0 0/.8);--ld1:rgb(255 255 255/.14);--ld2:#c9cde4}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#090d20;--ink:#eef0fa;--muted:#9aa2c6;--surface:#111735;--line:rgb(255 255 255/.08);--shadow:0 30px 70px -30px rgb(0 0 0/.8);--ld1:rgb(255 255 255/.14);--ld2:#c9cde4}}
 </style>
 </head>
 <body>

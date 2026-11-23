@@ -12,12 +12,12 @@
 <style>
 /* Super Over: same night-match look as the other games. The six balls of the over sit on top of the navy board as the progress marker. */
 :root{color-scheme:light dark;
-  --bg:light-dark(#f6f7fb,#090d20);--ink:light-dark(#0b1030,#eef0fa);--muted:light-dark(#5b6283,#9aa2c6);
-  --surface:light-dark(#ffffff,#111735);--surface-2:light-dark(#eef0f7,#171e42);--line:light-dark(#dfe2ee,rgb(255 255 255/.08));
+  --bg:#f6f7fb;--ink:#0b1030;--muted:#5b6283;
+  --surface:#ffffff;--surface-2:#eef0f7;--line:#dfe2ee;
   --board:#0f1534;--chalk:#eef0fa;--chalk-2:#a9b0d2;--slot:rgb(255 255 255/.05);--slot-line:rgb(255 255 255/.08);
   --gold:#d9ae5b;--gold-hi:#f3d48a;--gold-lo:#b8862d;--gold-ink:#2a1d05;
   --hit:#1fa463;--close:#f2c14e;--close-ink:#2b1f00;--miss:#c9343c;--none:#3a4166;
-  --shadow:light-dark(0 24px 60px -30px rgb(11 16 48/.45),0 30px 70px -30px rgb(0 0 0/.8))}
+  --shadow:0 24px 60px -30px rgb(11 16 48/.45)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 :root.cb{--hit:#e0682a;--close:#6aaef0;--close-ink:#08223d;--miss:#4e5566}
 *{box-sizing:border-box;min-width:0}
@@ -133,7 +133,7 @@ textarea{width:100%;margin-top:10px;min-height:110px;border-radius:12px;border:1
 .guide{margin-top:40px}
 .guide section{padding:16px 0;margin-top:22px;border-top:1px solid var(--line)}
 .guide h2{margin:0 0 12px;font-size:22px}
-.guide p,.guide li{max-width:66ch;color:light-dark(#2a3050,#c9cde4)}
+.guide p,.guide li{max-width:66ch;color:var(--ld1)}
 .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
 .legend span{display:inline-flex;align-items:center;gap:7px}.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
 footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
@@ -202,6 +202,11 @@ details.fold[open]>summary{margin-bottom:14px}
 .ready{text-align:center;padding:10px 0 6px}.ready .qtext{margin-bottom:6px}.hint2{margin:0 auto 18px;color:var(--chalk-2);font-size:14px;max-width:46ch}
 .rnote{margin:0;color:var(--muted);font-size:14px}
 @media(max-width:560px){.opts{grid-template-columns:1fr}.balls{gap:7px}.balls li{width:34px;height:34px}}
+
+/* dark mode values (plain variables, no light-dark(), so older browsers work) */
+:root{--ld1:#2a3050}
+:root[data-theme=dark]{--bg:#090d20;--ink:#eef0fa;--muted:#9aa2c6;--surface:#111735;--surface-2:#171e42;--line:rgb(255 255 255/.08);--shadow:0 30px 70px -30px rgb(0 0 0/.8);--ld1:#c9cde4}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#090d20;--ink:#eef0fa;--muted:#9aa2c6;--surface:#111735;--surface-2:#171e42;--line:rgb(255 255 255/.08);--shadow:0 30px 70px -30px rgb(0 0 0/.8);--ld1:#c9cde4}}
 </style>
 </head>
 <body>
