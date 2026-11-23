@@ -161,6 +161,17 @@ details.fold[open]>summary::after{transform:rotate(180deg)}
 details.fold>summary:hover::after{border-color:var(--gold)}
 details.fold>summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 details.fold[open]>summary{margin-bottom:14px}
+
+/* team colours */
+.sw{flex:none;width:22px;height:22px;border-radius:6px;display:inline-block;box-shadow:0 0 0 1px rgb(255 255 255/.18)}
+.chip{gap:12px}
+.mini i{position:relative;overflow:hidden;padding-bottom:6px}
+.mini i u{position:absolute;left:0;right:0;bottom:0;height:3px}
+.slot,.picker button{position:relative;overflow:hidden}
+i.top{position:absolute;left:0;right:0;top:0;height:6px;display:block}
+.picker button{padding-top:11px}
+i.dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;box-shadow:0 0 0 1px rgb(255 255 255/.2)}
+.rpath span{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -250,6 +261,12 @@ details.fold[open]>summary{margin-bottom:14px}
 const RAW = /*__PATHDATA__*/{players:[], paths:{}};
 const $ = s => document.querySelector(s);
 const TEAM = {CSK:"Chennai Super Kings", DC:"Delhi Capitals", DCH:"Deccan Chargers", GL:"Gujarat Lions", GT:"Gujarat Titans", KKR:"Kolkata Knight Riders", KTK:"Kochi Tuskers Kerala", LSG:"Lucknow Super Giants", MI:"Mumbai Indians", PBKS:"Punjab Kings", PWI:"Pune Warriors", RCB:"Royal Challengers Bengaluru", RPS:"Rising Pune Supergiant", RR:"Rajasthan Royals", SRH:"Sunrisers Hyderabad"};
+// franchise colours (2-3 each) so teams are easy to spot at a glance
+const TC = {CSK:["#f9cd05","#0081e9"], MI:["#004ba0","#d1ab3e"], RCB:["#ec1c24","#2b2a29","#d4af37"], KKR:["#3a225d","#b3a123"],
+  SRH:["#ff822a","#111111"], RR:["#ea1a85","#254aa5"], DC:["#17479e","#ef1b23"], PBKS:["#dd1f2d","#a7a9ac"], LSG:["#0057e2","#a72056","#f28b00"],
+  GT:["#1b2133","#b5985a"], DCH:["#2a3e6c","#c0c0c0","#d4af37"], GL:["#e04f16","#f6b219"], RPS:["#6a2c91","#d11d9b"], PWI:["#1ea5dc","#111111"], KTK:["#f15a22","#6b1f7a"]};
+const stripes = t => {const c = TC[t] || ["#888"], w = 100 / c.length; return `linear-gradient(90deg,${c.map((x, i) => `${x} ${i * w}% ${(i + 1) * w}%`).join(",")})`;};
+const sw = (t, cls = "sw") => `<i class="${cls}" style="background:${stripes(t)}" aria-hidden="true"></i>`;
 const ROLE = {BAT:"Batter", BOWL:"Bowler", AR:"All-rounder", WK:"Wicketkeeper"};
 const CNAME = {IND:"India", AUS:"Australia", NZ:"New Zealand", ENG:"England", SA:"South Africa", WI:"West Indies", SL:"Sri Lanka", PAK:"Pakistan", AFG:"Afghanistan", BAN:"Bangladesh", ZIM:"Zimbabwe", NEP:"Nepal", NED:"Netherlands", KEN:"Kenya", IRE:"Ireland"};
 const FLAG = /*__FLAGS__*/{};
@@ -340,14 +357,14 @@ function colourPath(guess, ans){
 }
 function renderGuess(){
   const s = S.guess, a = s.answer;
-  $("#gPath").innerHTML = a.path.map(([t, ys]) => `<li><span class="yr">${yrs(ys)}</span><span class="chip"><b>${t}</b><span>${TEAM[t] || t}</span></span></li>`).join("");
+  $("#gPath").innerHTML = a.path.map(([t, ys]) => `<li><span class="yr">${yrs(ys)}</span><span class="chip" style="border-left:5px solid ${(TC[t] || ["#888"])[0]}">${sw(t)}<b>${t}</b><span>${TEAM[t] || t}</span></span></li>`).join("");
   const wrong = s.rows.filter(id => id !== a.id).length, open = s.done ? CLUES.length : wrong;
   $("#gClues").innerHTML = CLUES.map(([label, f], i) => i < open
     ? `<div class="clue on">${label}<b>${f(a)}</b></div>`
     : `<div class="clue">${label}<b>Unlocks after ${i + 1} wrong guess${i ? "es" : ""}</b></div>`).join("");
   $("#gRows").innerHTML = s.rows.map(id => {
     const p = byId.get(id), win = id === a.id;
-    const cells = colourPath(p, a).map(c => `<i class="${c.s}">${c.t}</i>`).join("");
+    const cells = colourPath(p, a).map(c => `<i class="${c.s}">${c.t}<u style="background:${stripes(c.t)}" aria-hidden="true"></u></i>`).join("");
     return `<div class="g${win ? " win" : ""}"><span class="nm">${flag(p.c)}${p.n}${win ? " ✓" : ""}</span><span class="mini" aria-label="${p.n}'s path: ${p.path.map(x => x[0]).join(", ")}">${cells}</span></div>`;
   }).join("");
   $("#gLeft").innerHTML = s.done ? `<b>${s.won ? `Got it in ${s.rows.length}` : "Out of guesses"}</b>` : `<b>${GAME.guess.max - s.rows.length}</b> guesses left`;
@@ -419,10 +436,10 @@ function renderBuild(){
   $("#bRows").style.setProperty("--n", n);
   let html = s.rows.map(row => {
     const sc = scoreRow(row, a);
-    return `<div class="brow" style="--n:${n}">${row.map((t, i) => `<div class="slot ${sc[i]}" aria-label="${yrs(a.path[i][1])}: ${TEAM[t]}, ${({hit:"right", close:"in his path, different place", miss:"not in his path"})[sc[i]]}"><b>${t}</b><small>${yrs(a.path[i][1])}</small></div>`).join("")}</div>`;
+    return `<div class="brow" style="--n:${n}">${row.map((t, i) => `<div class="slot ${sc[i]}" aria-label="${yrs(a.path[i][1])}: ${TEAM[t]}, ${({hit:"right", close:"in his path, different place", miss:"not in his path"})[sc[i]]}">${sw(t, "top")}<b>${t}</b><small>${yrs(a.path[i][1])}</small></div>`).join("")}</div>`;
   }).join("");
   if (!s.done) {
-    html += `<div class="brow" style="--n:${n}">${draft.map((t, i) => `<button type="button" class="slot${i === cur ? " sel" : ""}" data-i="${i}" aria-label="Stint ${i + 1}, ${yrs(a.path[i][1])}: ${t ? TEAM[t] : "empty"}"><b>${t || "?"}</b><small>${yrs(a.path[i][1])}</small></button>`).join("")}</div>`;
+    html += `<div class="brow" style="--n:${n}">${draft.map((t, i) => `<button type="button" class="slot${i === cur ? " sel" : ""}" data-i="${i}" aria-label="Stint ${i + 1}, ${yrs(a.path[i][1])}: ${t ? TEAM[t] : "empty"}">${t ? sw(t, "top") : ""}<b>${t || "?"}</b><small>${yrs(a.path[i][1])}</small></button>`).join("")}</div>`;
     const empties = GAME.build.max - s.rows.length - 1;
     for (let k = 0; k < empties; k++) html += `<div class="brow" style="--n:${n}">${a.path.map(x => `<div class="slot" aria-hidden="true"><small>${yrs(x[1])}</small></div>`).join("")}</div>`;
   }
@@ -431,7 +448,7 @@ function renderBuild(){
   const ys = a.path[cur] ? a.path[cur][1] : [];
   $("#bPick").innerHTML = s.done ? "" : Object.keys(TEAM).filter(t => ACTIVE[t]).sort().map(t => {
     const ok = ys.some(y => ACTIVE[t].has(y));
-    return `<button type="button" data-t="${t}" ${ok ? "" : "disabled"} title="${TEAM[t]}${ok ? "" : " didn't play in these seasons"}"><b>${t}</b><small>${TEAM[t].split(" ").slice(-1)[0]}</small></button>`;
+    return `<button type="button" data-t="${t}" ${ok ? "" : "disabled"} title="${TEAM[t]}${ok ? "" : " didn't play in these seasons"}">${sw(t, "top")}<b>${t}</b><small>${TEAM[t].split(" ").slice(-1)[0]}</small></button>`;
   }).join("");
   $("#bPick").querySelectorAll("button").forEach(b => b.onclick = () => {
     draft[cur] = b.dataset.t;
@@ -472,7 +489,7 @@ function renderResult(){
   if (!s.done) return;
   box.hidden = false;
   box.innerHTML = `<div class="rhead"><b>${s.won ? "Well played!" : "Bowled out"}</b><span>${s.won ? `Got it in ${s.rows.length} of ${GAME[game].max}` : "Out of tries"}</span></div>
-    <div class="reveal"><span>${game === "guess" ? "The player was" : "His path was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${a.path.map(([t, ys]) => `${t} ${yrs(ys)}`).join(" → ")}</span></div>
+    <div class="reveal"><span>${game === "guess" ? "The player was" : "His path was"}</span><strong>${flag(a.c)}${a.n}</strong><span class="rpath">${a.path.map(([t, ys]) => `<span>${sw(t, "dot")}${t} ${yrs(ys)}</span>`).join(" → ")}</span></div>
     <div class="acts"><button class="btn" id="rShare" type="button">Copy result</button><button class="btn ghost" id="rNew" type="button">${s.practice ? "New practice player" : "Play practice"}</button>${s.practice ? "" : `<button class="btn ghost" id="rStats" type="button">Your stats</button>`}</div>
     ${s.practice ? "" : `<p class="rnext">Next Career Path in <b class="rNext">${countdown()}</b></p>`}
     <textarea id="rBox" hidden readonly aria-label="Result to copy"></textarea>`;
