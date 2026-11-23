@@ -1,4 +1,4 @@
-# Crickdle
+# Wicketle
 
 A daily guess-the-IPL-player game. Every player who made an IPL playing XI from 2008 to 2026 (809 players) can be guessed.
 
@@ -64,7 +64,7 @@ Match data comes from [Cricsheet](https://cricsheet.org), released under the Ope
 
 ## Publishing checklist
 - Set `CONTACT_EMAIL` near the top of the script in `src/template.html` (or directly in `index.html`) to show the corrections email in About, Privacy and the footer. It stays hidden while empty.
-- The About section and the footer credit Cricsheet (ODC-By) and the IPL-DATASET mirror (MIT), and state that Crickdle is unofficial and not affiliated with the IPL, BCCI or any team. Keep these when you change the page.
+- The About section and the footer credit Cricsheet (ODC-By) and the IPL-DATASET mirror (MIT), and state that Wicketle is unofficial and not affiliated with the IPL, BCCI or any team. Keep these when you change the page.
 - Birth dates flagged `?` in `data/dob_curated.tsv` are skipped by the build, so those players show a "?" age. To restore one, put a confirmed date in `dob_verified.tsv`.
 - Country flags are simplified inline SVG drawings (the `FLAG` map in the template). A new country needs a new entry there, or it shows the code without a flag.
 
@@ -79,14 +79,16 @@ The Archive button opens a calendar of every daily puzzle since Puzzle #1 (23 No
 ## Google sign-in (optional)
 Sign-in uses Google Firebase (free Spark plan). It stays switched off, with no account button, until you add your project's settings.
 
-1. Go to https://console.firebase.google.com, click **Create a project**, name it `crickdle`, and turn Google Analytics off (not needed).
+1. Go to https://console.firebase.google.com, click **Create a project**, name it `wicketle`, and turn Google Analytics off (not needed).
 2. **Build → Authentication → Get started → Sign-in method → Google → Enable**. Pick a support email and save.
 3. **Authentication → Settings → Authorized domains → Add domain**: `nannukalapala2004-svg.github.io` (and your custom domain later).
 4. **Build → Firestore Database → Create database**. Choose a location near your players (for India, `asia-south1` Mumbai) and start in **production mode**.
 5. In Firestore, open the **Rules** tab, replace everything with the contents of `firestore.rules` from this repository, and click **Publish**.
-6. **Project settings (gear icon) → General → Your apps → Web (`</>`)**. Register an app called `crickdle` (no Hosting). Copy the `firebaseConfig` object it shows.
+6. **Project settings (gear icon) → General → Your apps → Web (`</>`)**. Register an app called `wicketle` (no Hosting). Copy the `firebaseConfig` object it shows.
 7. In `src/template.html` (or `player/index.html`), replace `const FIREBASE_CONFIG = null;` with `const FIREBASE_CONFIG = { ...the object you copied... };`, rebuild with `python3 scripts/build_site.py` and publish.
 
 The web config (apiKey and so on) is not a secret: it only identifies the project. The Firestore rules are what keep each player's history private to them.
 
 Each signed-in player has one document, `users/<their uid>`, holding `{hist: {<mode>: {<day>: entry}}, updated}`. On sign-in the device's history and the account's history are merged (a finished game beats an unfinished one; a game counts as daily if any device played it on its day). After that, every guess is saved to the account.
+
+Note: saved progress uses `localStorage` keys starting `crickdle:` (the game's earlier name). They are kept on purpose so players don't lose their history; don't rename them.
