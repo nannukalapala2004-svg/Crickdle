@@ -75,7 +75,8 @@
     const icons = document.querySelector("header .icons");
     btn = document.createElement("button");
     btn.className = "ib"; btn.id = "bAcct"; btn.type = "button";
-    if (icons) icons.prepend(btn); else document.querySelector("header").appendChild(btn);
+    // always the right-most icon, just after the dark mode switch
+    if (icons) icons.appendChild(btn); else document.querySelector("header").appendChild(btn);
   }
   btn.hidden = false;
   btn.innerHTML = ICON;
