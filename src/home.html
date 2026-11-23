@@ -67,7 +67,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .mover{justify-self:center;text-align:center}
 .mover ol{list-style:none;margin:0;padding:0;display:flex;gap:8px}
 .mover li{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--hit)}
-.mover li.no{background:var(--miss)}
+.mover li.r0{background:var(--miss)}.mover li.r6{background:var(--gold);color:var(--gold-ink)}.mover li.r4{background:#2f80ed}
 .mover p{margin:12px 0 0;font-size:30px;font-weight:700;color:var(--gold-hi);line-height:1}
 .soon{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:22px;border:1.5px dashed light-dark(#c9cde0,rgb(255 255 255/.14));color:var(--muted)}
 .soon svg{width:40px;height:40px;flex:none;color:var(--gold)}
@@ -180,11 +180,11 @@ const GAMES = [
     id: "over",
     href: "over/",
     tag: "Daily",
-    title: "The Over",
-    blurb: "Six IPL trivia questions a day, one for each ball of the over: champions, finals, Orange and Purple Caps, records and transfers. How many can you hit?",
-    // the six balls of an over: ✓ right, ✗ wrong
-    over: "✓✓✗✓✓✓",
-    next: "over"
+    title: "Super Over",
+    blurb: "Six IPL trivia questions a day, one per ball. Answer fast to hit sixes: the quicker you are, the more runs you score. Wrong answers are dot balls.",
+    // runs off each ball of a sample over
+    over: [6, 4, 0, 6, 3, 6],
+    next: "Super Over"
   }
 ];
 
@@ -194,7 +194,7 @@ for (const g of GAMES) {
   const art = g.board
     ? `<div class="tiles" aria-hidden="true">${g.board.map(r => `<div>${[...r].map(t => `<i class="${t}"></i>`).join("")}</div>`).join("")}</div>`
     : g.over
-    ? `<div class="mover" aria-hidden="true"><ol>${[...g.over].map(c => `<li class="${c === "✓" ? "ok" : "no"}">${c}</li>`).join("")}</ol><p>5/6</p></div>`
+    ? `<div class="mover" aria-hidden="true"><ol>${g.over.map(r => `<li class="r${r}">${r || "•"}</li>`).join("")}</ol><p>${g.over.reduce((a, b) => a + b, 0)} runs</p></div>`
     : `<ol class="mpath" aria-hidden="true">${g.path.map(([y, t]) => `<li><span>${y}</span><b>${t}</b></li>`).join("")}</ol>`;
   html += `<article class="game" aria-labelledby="t-${g.id}">
     <div>

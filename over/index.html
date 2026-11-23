@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Over – Wicketle</title>
-<meta name="description" content="The Over: six IPL trivia questions every day. How many can you hit?">
+<title>Super Over – Wicketle</title>
+<meta name="description" content="Super Over: six IPL trivia questions a day. Answer fast to hit sixes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script>try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}</script>
 <style>
-/* The Over: same night-match look as the other games. The six balls of the over sit on top of the navy board as the progress marker. */
+/* Super Over: same night-match look as the other games. The six balls of the over sit on top of the navy board as the progress marker. */
 :root{color-scheme:light dark;
   --bg:light-dark(#f6f7fb,#090d20);--ink:light-dark(#0b1030,#eef0fa);--muted:light-dark(#5b6283,#9aa2c6);
   --surface:light-dark(#ffffff,#111735);--surface-2:light-dark(#eef0f7,#171e42);--line:light-dark(#dfe2ee,rgb(255 255 255/.08));
@@ -184,6 +184,23 @@ details.fold[open]>summary{margin-bottom:14px}
 .review li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:14px;color:var(--chalk-2)}
 .review li i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;background:var(--hit)}
 .review li i.no{background:var(--miss)}.review li b{color:var(--chalk);font-weight:600}
+.overbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+.overbar .balls{margin:0}
+.tally{margin:0;font-size:14px;color:var(--chalk-2)}.tally b{font-size:24px;color:var(--gold-hi);margin-right:2px}
+.balls li.ok{background:var(--hit);border-color:var(--hit);color:#fff}
+.balls li.r6{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.balls li.r4{background:#2f80ed;border-color:#2f80ed;color:#fff}
+.qtop{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.clock{margin:0;font-size:13px;color:var(--chalk-2);font-variant-numeric:tabular-nums}.clock b{color:var(--chalk)}
+.tbar{height:6px;border-radius:99px;background:rgb(255 255 255/.08);margin:6px 0 14px;overflow:hidden}
+.tbar i{display:block;height:100%;border-radius:99px;background:var(--hit);transition:width .1s linear}
+.tbar i.r6{background:var(--gold)}.tbar i.r4{background:#2f80ed}.tbar i.r3,.tbar i.r2{background:var(--hit)}.tbar i.r1{background:var(--close)}
+.runs{font-weight:700;color:var(--chalk)}.runs.r6{color:var(--gold-hi)}.runs.r0{color:#ff8a8f}
+.review li i.r6{background:var(--gold);color:var(--gold-ink)}.review li i.r4{background:#2f80ed}
+.score b{font-size:34px}
+.rtab{border-collapse:collapse;margin:6px 0 14px;font-size:14px}.rtab th,.rtab td{text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--line)}.rtab th{font-weight:600}
+.ready{text-align:center;padding:10px 0 6px}.ready .qtext{margin-bottom:6px}.hint2{margin:0 auto 18px;color:var(--chalk-2);font-size:14px;max-width:46ch}
+.rnote{margin:0;color:var(--muted);font-size:14px}
 @media(max-width:560px){.opts{grid-template-columns:1fr}.balls{gap:7px}.balls li{width:34px;height:34px}}
 </style>
 </head>
@@ -202,25 +219,29 @@ details.fold[open]>summary{margin-bottom:14px}
     </div>
   </header>
 
-  <h1 class="title">The Over</h1>
-  <p class="tagline">Six cricket trivia questions a day: one over, six balls. How many can you hit?</p>
+  <h1 class="title">Super Over</h1>
+  <p class="tagline">Six IPL trivia questions a day, one per ball. Answer fast to score big: the quicker you hit, the more runs you get.</p>
   <div class="sub">
     <div class="lab" id="lab"></div>
     <button class="tb" id="bPractice" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span>Practice</span></button>
   </div>
 
   <section class="board" aria-label="Questions">
-    <ol class="balls" id="balls" aria-label="Your over"></ol>
+    <div class="overbar"><ol class="balls" id="balls" aria-label="Your over"></ol><p class="tally" id="tally" aria-live="polite"></p></div>
     <div id="qa" aria-live="polite"></div>
   </section>
   <div class="result" id="result" aria-live="polite" hidden></div>
 
   <div class="guide">
-    <section id="how"><details class="fold"><summary><h2>How to play The Over</h2></summary>
-      <p>Every day there are six multiple-choice questions about the IPL, the same for everyone. Each question is a ball of the over. Pick an answer: you get one try per ball, then see the right answer and a fact before the next ball.</p>
+    <section id="how"><details class="fold"><summary><h2>How to play Super Over</h2></summary>
+      <p>Every day there are six multiple-choice questions about the IPL, the same for everyone. Each question is a ball of the over, and you score runs like a batter: the faster you pick the right answer, the more runs.</p>
+      <table class="rtab"><thead><tr><th>Right answer within</th><th>Runs</th></tr></thead><tbody>
+        <tr><td>6 seconds</td><td><b>6</b></td></tr><tr><td>10 seconds</td><td><b>4</b></td></tr><tr><td>15 seconds</td><td><b>3</b></td></tr><tr><td>20 seconds</td><td><b>2</b></td></tr><tr><td>30 seconds</td><td><b>1</b></td></tr>
+        <tr><td>Wrong answer, or no answer in 30 seconds</td><td><b>0</b> (dot ball)</td></tr></tbody></table>
+      <p>The best possible score is 36: six sixes. The clock starts when you press Face the first ball, and for each later ball when it appears. It keeps running if you leave the page. After each ball you see the right answer and a fact; press Next ball when you're ready, as the next clock only starts then.</p>
       <p>Questions cover IPL champions and finals, Player of the Match awards, the season's top run-scorers and wicket-takers, career records, debuts and the teams players played for. Every answer is worked out from the ball-by-ball records of every IPL match from 2008 to 2026.</p>
-      <p>A new over arrives at midnight your local time. Practice gives you a random over any time and doesn't count towards your stats. Your streak counts the days in a row you play.</p>
-      <p>Records count IPL matches only, including playoffs; super overs are left out. Top run-scorer and wicket-taker questions count every match of that season. Delhi Daredevils, Kings XI Punjab and Royal Challengers Bangalore appear under their current names (DC, PBKS, RCB).</p>
+      <p>A new Super Over arrives at midnight your local time. Practice gives you a random over any time and doesn't count towards your stats. Your streak counts the days in a row you play.</p>
+      <p>Records count IPL matches only, including playoffs; super overs are left out. Delhi Daredevils, Kings XI Punjab and Royal Challengers Bangalore appear under their current names (DC, PBKS, RCB).</p>
       </details>
     </section>
   </div>
@@ -370,71 +391,106 @@ function makeOver(seed){
 }
 
 // ---------- state ----------
-let practice = false, Q = [], picks = [];
+// Each ball: answer fast for more runs. Right within 6s = 6, 10s = 4, 15s = 3, 20s = 2, 30s = 1. Wrong or time up = 0 (dot ball).
+const SCALE = [[6, 6], [10, 4], [15, 3], [20, 2], [30, 1]], LIMIT = 30;
+const runsFor = (right, secs) => right ? (SCALE.find(([t]) => secs <= t) || [0, 0])[1] : 0;
+const worth = secs => (SCALE.find(([t]) => secs < t) || [0, 0])[1];
+let practice = false, Q = [], balls = [], started = null, revealing = false, timer = null;
+// balls[i] = {pick: option index or -1 for time up, ms: time taken, runs}
 function loadDaily(){
   practice = false; Q = makeOver(880000 + DAY * 7919);
-  const s = store.get("day", null);
-  picks = s && s.day === DAY ? s.picks : [];
+  const s = store.get("day2", null);
+  if (s && s.day === DAY) {balls = s.balls; started = s.started || null;} else {balls = []; started = null;}
+  revealing = false;
 }
-function startPractice(){practice = true; Q = makeOver(Math.floor(Math.random() * 1e9)); picks = []; render(); $("#qa").scrollIntoView({block:"nearest"});}
-function save(){if (!practice) store.set("day", {day:DAY, picks});}
-const blank = () => ({played:0, total:0, perfect:0, streak:0, best:0, last:null, dist:[0,0,0,0,0,0,0]});
+function startPractice(){practice = true; Q = makeOver(Math.floor(Math.random() * 1e9)); balls = []; started = null; revealing = false; render(); $("#qa").scrollIntoView({block:"nearest"});}
+function save(){if (!practice) store.set("day2", {day:DAY, balls, started});}
+const blank = () => ({played:0, total:0, best:0, sixes:0, streak:0, bestStreak:0, last:null});
 function record(){
   if (practice) return;
-  const st = store.get("stats", blank()), sc = score();
-  st.played++; st.total += sc; st.dist[sc]++; if (sc === 6) st.perfect++;
-  st.streak = st.last === DAY - 1 ? st.streak + 1 : 1; st.best = Math.max(st.best, st.streak); st.last = DAY;
-  store.set("stats", st);
+  const st = store.get("stats2", blank()), sc = total();
+  st.played++; st.total += sc; st.best = Math.max(st.best, sc); st.sixes += balls.filter(b => b.runs === 6).length;
+  st.streak = st.last === DAY - 1 ? st.streak + 1 : 1; st.bestStreak = Math.max(st.bestStreak, st.streak); st.last = DAY;
+  store.set("stats2", st);
 }
-const score = () => picks.filter((p, i) => p === Q[i].a).length;
-const done = () => picks.length >= Q.length;
+const total = () => balls.reduce((n, b) => n + b.runs, 0);
+const done = () => balls.length >= Q.length;
 const letters = ["A", "B", "C", "D"];
+const ballText = r => r === 0 ? "•" : String(r);
 
 function render(){
-  $("#lab").innerHTML = practice ? `Practice<small>A random over. Doesn't count towards your stats.</small>` : `The Over #${DAY + 1}<small>Today's six questions</small>`;
+  clearInterval(timer);
+  $("#lab").innerHTML = practice ? `Practice<small>A random Super Over. Doesn't count towards your stats.</small>` : `Super Over #${DAY + 1}<small>Today's six balls</small>`;
   $("#bPractice").setAttribute("aria-pressed", practice ? "true" : "false");
   $("#bPractice span").textContent = practice ? "Back to today" : "Practice";
-  const cur = picks.length, show = revealing ? cur - 1 : cur;
+  const cur = balls.length, show = revealing ? cur - 1 : cur;
   $("#balls").innerHTML = Q.map((q, i) => {
-    const st = (i < cur ? (picks[i] === q.a ? "ok" : "no") : "") + (i === show ? " cur" : "");
-    const label = i < cur ? (picks[i] === q.a ? "right" : "wrong") : i === cur ? "current ball" : "to come";
-    return `<li class="${st}" aria-label="Ball ${i + 1}: ${label}">${i < cur ? (picks[i] === q.a ? "✓" : "✗") : i + 1}</li>`;
+    const b = balls[i], st = (b ? (b.runs ? "ok r" + b.runs : "no") : "") + (i === show ? " cur" : "");
+    const label = b ? (b.runs ? `${b.runs} run${b.runs > 1 ? "s" : ""}` : "dot ball") : i === show ? "current ball" : "to come";
+    return `<li class="${st}" aria-label="Ball ${i + 1}: ${label}">${b ? ballText(b.runs) : i + 1}</li>`;
   }).join("");
-  // show the current ball, or the last answered one with its fact until "Next ball" is pressed
-  if (show >= Q.length || show < 0) {$("#qa").innerHTML = done() ? `<p class="qnum">Over complete</p><p class="qtext" style="margin:0">${score()} out of 6. See your result below.</p>` : ""; renderResult(); return;}
-  const q = Q[show], answered = show < cur;
-  $("#qa").innerHTML = `<p class="qnum">Ball ${show + 1} of 6</p><p class="qtext">${q.q}</p>
+  $("#tally").innerHTML = `<b>${total()}</b> run${total() === 1 ? "" : "s"}`;
+  if (show >= Q.length || show < 0) {$("#qa").innerHTML = done() ? `<p class="qnum">Over complete</p><p class="qtext" style="margin:0">You scored ${total()} runs. See your result below.</p>` : ""; renderResult(); return;}
+  const q = Q[show], b = balls[show];
+  if (show === 0 && !b && !started) {
+    $("#qa").innerHTML = `<div class="ready"><p class="qtext">Ready to bat?</p><p class="hint2">Six questions, one per ball. Answer within 6 seconds for a six; the slower you are, the fewer runs. Wrong answers and timeouts are dot balls.</p><button class="btn" id="bStart" type="button">Face the first ball</button></div>`;
+    $("#bStart").onclick = () => {started = Date.now(); save(); render(); const o = $("#qa .opts button"); if (o) o.focus();};
+    renderResult(); return;
+  }
+  $("#qa").innerHTML = `<div class="qtop"><p class="qnum">Ball ${show + 1} of 6</p>${b ? "" : `<p class="clock" id="clock" aria-live="off"></p>`}</div>
+    ${b ? "" : `<div class="tbar" aria-hidden="true"><i id="tfill"></i></div>`}
+    <p class="qtext">${q.q}</p>
     <div class="opts" role="group" aria-label="Answers">${q.opts.map((o, i) => {
-      const cls = !answered ? "" : i === q.a ? "right" : i === picks[show] ? "wrong" : "dim";
-      return `<button type="button" data-i="${i}" class="${cls}" ${answered ? "disabled" : ""}><b>${letters[i]}</b><span>${o}</span></button>`;
+      const cls = !b ? "" : i === q.a ? "right" : i === b.pick ? "wrong" : "dim";
+      return `<button type="button" data-i="${i}" class="${cls}" ${b ? "disabled" : ""}><b>${letters[i]}</b><span>${o}</span></button>`;
     }).join("")}</div>
-    ${answered ? `<p class="fact">${picks[show] === q.a ? "Right! " : "Not quite. "}${q.fact}</p><div class="next"><button class="btn" id="bNext" type="button">${show === 5 ? "See your result" : "Next ball"}</button></div>` : ""}`;
-  $("#qa").querySelectorAll(".opts button:not(:disabled)").forEach(b => b.onclick = () => answer(+b.dataset.i));
-  if ($("#bNext")) $("#bNext").onclick = () => {revealing = false; render(); if (done()) setTimeout(() => $("#result").scrollIntoView({behavior:"smooth", block:"nearest"}), 100); else $("#qa .opts button").focus();};
+    ${b ? `<p class="fact"><span class="runs r${b.runs}">${b.pick < 0 ? "Time's up! Dot ball." : b.runs ? `${b.runs === 6 ? "SIX! " : b.runs === 4 ? "FOUR! " : ""}${b.runs} run${b.runs > 1 ? "s" : ""} in ${(b.ms / 1000).toFixed(1)}s.` : "Wrong answer. Dot ball."}</span> ${q.fact}</p>
+      <div class="next"><button class="btn" id="bNext" type="button">${show === 5 ? "See your result" : "Next ball"}</button></div>` : ""}`;
+  if (!b) {
+    if (!started) {started = Date.now(); save();}
+    $("#qa").querySelectorAll(".opts button").forEach(x => x.onclick = () => answer(+x.dataset.i));
+    tick(); timer = setInterval(tick, 100);
+  } else {
+    $("#bNext").onclick = () => {revealing = false; render(); if (done()) setTimeout(() => $("#result").scrollIntoView({behavior:"smooth", block:"nearest"}), 100); else $("#qa .opts button").focus();};
+  }
   renderResult();
 }
-let revealing = false;
+// the clock keeps running across reloads, so leaving the page doesn't reset a ball's timer
+function tick(){
+  const secs = (Date.now() - started) / 1000, left = Math.max(0, LIMIT - secs);
+  if (left <= 0) {answer(-1); return;}
+  const w = worth(secs);
+  $("#clock").innerHTML = `Worth <b class="r${w}">${w} run${w > 1 ? "s" : ""}</b> · ${Math.ceil(left)}s`;
+  $("#tfill").style.width = (left / LIMIT * 100) + "%";
+  $("#tfill").className = "r" + w;
+}
 function answer(i){
-  if (done()) return;
-  picks.push(i); revealing = true;
+  if (done() || revealing) return;
+  clearInterval(timer);
+  const ms = Math.min(Date.now() - started, LIMIT * 1000), q = Q[balls.length];
+  balls.push({pick:i, ms, runs:runsFor(i === q.a, ms / 1000)});
+  started = null; revealing = true;
   if (done()) record();
   save(); render();
-  $("#bNext").focus();
+  const n = $("#bNext"); if (n) n.focus();
 }
-const VERDICT = ["A maiden over for you. Better luck tomorrow!", "One hit. Keep at it!", "Two out of six. Not bad!", "Half the over. Solid!", "Four out of six. Good over!", "Five out of six. So close to perfect!", "A perfect over! Six out of six."];
+function verdict(r){
+  return r === 36 ? "Six sixes! A perfect Super Over." : r >= 30 ? "Brutal hitting. What an over!" : r >= 24 ? "A big over. Well batted!" : r >= 16 ? "Solid over. Good batting." : r >= 8 ? "A few runs on the board." : r > 0 ? "A tough over. Better luck tomorrow!" : "A maiden over. The bowler wins this one.";
+}
 function countdown(){const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const s = Math.floor((m - n) / 1000); return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m`;}
+const KEY = {6:"6️⃣", 4:"4️⃣", 3:"3️⃣", 2:"2️⃣", 1:"1️⃣", 0:"⚪"};
 function shareText(){
-  return `Wicketle The Over ${practice ? "practice" : "#" + (DAY + 1)} ${score()}/6\n${Q.map((q, i) => picks[i] === q.a ? "🟩" : "🟥").join("")}` + (/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : "");
+  return `Wicketle Super Over ${practice ? "practice" : "#" + (DAY + 1)}: ${total()} runs\n${balls.map(b => KEY[b.runs]).join(" ")}` + (/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : "");
 }
 function renderResult(){
   const box = $("#result");
   if (!done() || revealing) {box.hidden = true; return;}
   box.hidden = false;
-  const sc = score();
-  box.innerHTML = `<div class="score"><b>${sc}/6</b><span>${VERDICT[sc]}</span></div>
-    <ol class="review">${Q.map((q, i) => `<li><i class="${picks[i] === q.a ? "" : "no"}" aria-label="${picks[i] === q.a ? "Right" : "Wrong"}">${picks[i] === q.a ? "✓" : "✗"}</i><span>${q.q}<br><b>${q.opts[q.a]}</b>${picks[i] === q.a ? "" : ` (you said ${q.opts[picks[i]]})`}</span></li>`).join("")}</ol>
+  const sc = total();
+  box.innerHTML = `<div class="score"><b>${sc} run${sc === 1 ? "" : "s"}</b><span>${verdict(sc)}</span></div>
+    <ol class="review">${Q.map((q, i) => {const b = balls[i]; return `<li><i class="${b.runs ? "r" + b.runs : "no"}" aria-label="${b.runs ? b.runs + " runs" : "Dot ball"}">${ballText(b.runs)}</i><span>${q.q}<br><b>${q.opts[q.a]}</b>${b.pick === q.a ? ` (${(b.ms / 1000).toFixed(1)}s)` : b.pick < 0 ? " (time ran out)" : ` (you said ${q.opts[b.pick]})`}</span></li>`;}).join("")}</ol>
     <div class="acts"><button class="btn" id="rShare" type="button">Copy result</button><button class="btn ghost" id="rNew" type="button">${practice ? "New practice over" : "Play practice"}</button>${practice ? "" : `<button class="btn ghost" id="rStatsBtn" type="button">Your stats</button>`}</div>
-    ${practice ? "" : `<p class="rnext">Next over in <b class="rNext">${countdown()}</b></p>`}
+    ${practice ? "" : `<p class="rnext">Next Super Over in <b class="rNext">${countdown()}</b></p>`}
     <textarea id="rBox" hidden readonly aria-label="Result to copy"></textarea>`;
   $("#rShare").onclick = async () => {
     const t = shareText();
@@ -446,15 +502,15 @@ function renderResult(){
 }
 setInterval(() => document.querySelectorAll(".rNext").forEach(n => n.textContent = countdown()), 30000);
 function showStats(){
-  const st = store.get("stats", blank()), streak = st.last != null && st.last >= DAY - 1 ? st.streak : 0;
-  $("#rTitle").textContent = "The Over statistics";
+  const st = store.get("stats2", blank()), streak = st.last != null && st.last >= DAY - 1 ? st.streak : 0;
+  $("#rTitle").textContent = "Super Over statistics";
   $("#rBody").innerHTML = "";
-  $("#rStats").innerHTML = [[st.played, "Played"], [st.played ? (st.total / st.played).toFixed(1) : "0", "Average"], [streak, "Day streak"], [st.perfect, "Perfect overs"]].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("");
-  $("#rActs").innerHTML = "";
+  $("#rStats").innerHTML = [[st.played, "Played"], [st.played ? Math.round(st.total / st.played) : 0, "Average runs"], [st.best, "Best score"], [streak, "Day streak"]].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("");
+  $("#rActs").innerHTML = st.sixes ? `<p class="rnote">You've hit ${st.sixes} six${st.sixes > 1 ? "es" : ""} so far.</p>` : "";
   if (!$("#dRes").open) $("#dRes").showModal();
 }
 $("#bStats").onclick = showStats;
-$("#bPractice").onclick = () => practice ? (loadDaily(), revealing = false, render()) : startPractice();
+$("#bPractice").onclick = () => practice ? (loadDaily(), render()) : startPractice();
 document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => b.closest("dialog").close());
 $("#dRes").addEventListener("click", e => {if (e.target === $("#dRes")) $("#dRes").close();});
 
