@@ -2,13 +2,13 @@
 
 A daily guess-the-IPL-player game. Every player who made an IPL playing XI from 2008 to 2026 (809 players) can be guessed.
 
-There is one daily puzzle, in **Normal** mode (players with 50+ IPL matches, 187 players). It has the stats, streak and archive. The other modes are **practice modes**, with a new random player every game:
+There is one daily puzzle, in **Full Toss** mode (key `normal`) (players with 50+ IPL matches, 187 players). It has the stats, streak and archive. The other modes are **practice modes**, with a new random player every game:
 
 | Mode | Answer pool | Players | Who you can guess |
 |---|---|---|---|
-| Normal (daily) | 50+ IPL matches | 187 | Normal players only |
-| Medium | 20+ IPL matches | 348 | Medium players only |
-| Hard | every IPL player | 809 | any IPL player |
+| Full Toss (daily, key `normal`) | 50+ IPL matches | 187 | Full Toss players only |
+| Good Length (key `medium`) | 20+ IPL matches | 348 | Good Length players only |
+| Yorker (key `hard`) | every IPL player | 809 | any IPL player |
 | Spot the Star | hand-picked legends in `data/iconic.txt` | 79 | Spot the Star players only |
 | 2026 season | played in IPL 2026 | 202 | any IPL player |
 

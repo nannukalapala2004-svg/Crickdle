@@ -230,7 +230,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
     <div class="modewrap">
       <button class="modebtn" id="bMode" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="modeMenu" title="Change game mode">
         <span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4v-6H4zM10 20h4V9h-4zM16 20h4V4h-4z" fill="currentColor"/></svg></span>
-        <span class="lb"><small>Mode</small><span id="modeLabel">Normal</span></span><span class="car" aria-hidden="true">▼</span>
+        <span class="lb"><small>Mode</small><span id="modeLabel">Full Toss</span></span><span class="car" aria-hidden="true">▼</span>
       </button>
       <div class="modemenu" id="modeMenu" role="menu" aria-label="Game mode" hidden></div>
     </div>
@@ -285,7 +285,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
     <section id="how">
       <h2>How to play Player of the Day</h2>
       <ol class="steps">
-        <li><b>Play the daily puzzle.</b> Normal mode has one player of the day, the same for everyone. For more games, tap the Mode button and pick Medium, Hard, Spot the Star or 2026 season: these are practice modes with a new random player every game.</li>
+        <li><b>Play the daily puzzle.</b> Full Toss mode has one player of the day, the same for everyone. For more games, tap the Mode button and pick Good Length, Yorker, Spot the Star or 2026 season: these are practice modes with a new random player every game.</li>
         <li><b>Type at least two letters</b> of any IPL player's name, first name or surname, in the search box.</li>
         <li><b>Choose a player</b> from the list by tapping it, or with the arrow keys and Enter.</li>
         <li><b>Read the row.</b> Twelve tiles light up green, yellow or red under the column names at the top of the board, comparing your guess with the hidden player. On a phone, swipe the board sideways to see every column.</li>
@@ -293,7 +293,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li><b>Follow the arrows</b> on number tiles to go higher or lower with your next guess.</li>
         <li><b>Keep guessing</b> until the Player tile turns green. You have 8 guesses.</li>
         <li><b>Share your result</b> with Copy result. It copies a spoiler-free grid of coloured squares.</li>
-        <li><b>Come back tomorrow.</b> A new player arrives at midnight your local time. Want more now? Pick Medium, Hard, Spot the Star or 2026 season from the Mode menu for unlimited random games.</li>
+        <li><b>Come back tomorrow.</b> A new player arrives at midnight your local time. Want more now? Pick Good Length, Yorker, Spot the Star or 2026 season from the Mode menu for unlimited random games.</li>
       </ol>
     </section>
 
@@ -322,7 +322,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <thead><tr><th>Mode</th><th>Who can be the answer</th><th>Players</th><th>Who you can guess</th></tr></thead>
         <tbody id="modeRows"></tbody>
       </table>
-      <p class="note">Only Normal has a daily puzzle and streak. In Normal, Medium and Spot the Star, the search only lists players from that mode, so every guess is a recognisable name. In Hard and 2026 season you can guess any IPL player.</p>
+      <p class="note">Only Full Toss has a daily puzzle and streak. In Full Toss, Good Length and Spot the Star, the search only lists players from that mode, so every guess is a recognisable name. In Yorker and 2026 season you can guess any IPL player.</p>
     </section>
 
     <section id="tips">
@@ -352,8 +352,8 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
       <h2>Rules</h2>
       <ul>
         <li>You get 8 guesses per puzzle.</li>
-        <li>There is one daily puzzle, in Normal mode, the same for every player. It resets at midnight your local time. Each day's player is picked at random from all Normal players, so a player can come up again on a later day.</li>
-        <li>The other modes are practice modes with a random player every game. In Normal, Medium and Spot the Star you can only guess players from that mode. In Hard and 2026 season you can guess any IPL player.</li>
+        <li>There is one daily puzzle, in Full Toss mode, the same for every player. It resets at midnight your local time. Each day's player is picked at random from all Full Toss players, so a player can come up again on a later day.</li>
+        <li>The other modes are practice modes with a random player every game. In Full Toss, Good Length and Spot the Star you can only guess players from that mode. In Yorker and 2026 season you can guess any IPL player.</li>
         <li>You can't guess the same player twice in one game.</li>
         <li>Practice games don't count towards your stats or streak.</li>
         <li>Missed a day? Open the <b>Archive</b> to play any earlier puzzle. Archive games don't count towards your streak.</li>
@@ -449,9 +449,9 @@ const ICONIC = new Set(["ba607b88", "4a8a2e3b", "740742ef", "1dc12ab9", "c4487b8
 // Only Normal has a daily puzzle; the other modes are practice-only (a random player each game).
 const DAILY = "normal";
 const MODES = {
-  normal: {label:"Normal", who:"Players with 50 or more IPL matches", seed:20260550, pool:P.filter(p => p.m >= 50), only:true},
-  medium: {label:"Medium", who:"Players with 20 or more IPL matches", pool:P.filter(p => p.m >= 20), only:true},
-  hard: {label:"Hard", who:"Every player who has played an IPL match since 2008", pool:P},
+  normal: {label:"Full Toss", who:"Players with 50 or more IPL matches", seed:20260550, pool:P.filter(p => p.m >= 50), only:true},
+  medium: {label:"Good Length", who:"Players with 20 or more IPL matches", pool:P.filter(p => p.m >= 20), only:true},
+  hard: {label:"Yorker", who:"Every player who has played an IPL match since 2008", pool:P},
   iconic: {label:"Spot the Star", who:"Legends and superstars of the IPL", pool:P.filter(p => ICONIC.has(p.id)), only:true},
   season: {label:"2026 season", who:"Players who played in IPL 2026", pool:P.filter(p => p.ls === 2026)}
 };
@@ -598,7 +598,7 @@ function render(newest){
   const pips = `<span class="pips" aria-hidden="true">${Array.from({length:MAX}, (_, i) => `<i class="${i < guesses.length ? "used" : ""}"></i>`).join("")}</span>`;
   $("#left").innerHTML = done ? `<b style="color:var(--ink)">${won ? `Got it in ${guesses.length}` : "Out of guesses"}</b>` : `${pips}<span><b style="color:var(--ink)">${MAX - guesses.length}</b> left</span><span class="vh">${MAX - guesses.length} guesses left</span>`;
   $("#bPractice").hidden = mode === DAILY;
-  $("#mode").innerHTML = practice ? (mode === DAILY ? "Practice: a random Normal player" : `${MODES[mode].label}: practice game`)
+  $("#mode").innerHTML = practice ? (mode === DAILY ? "Practice" : `${MODES[mode].label}: practice game`)
     : play < DAY ? `<span class="archbar"><span>Archive: Player of the Day #${play + 1}, ${dateText(play)}</span><button type="button" id="bToday">Back to today</button></span>`
     : `Player of the Day #${DAY + 1}`;
   const bt = $("#bToday"); if (bt) bt.onclick = () => {loadDaily(); render(false); toast("Today's puzzle");};
@@ -720,7 +720,7 @@ function openMenu(open){
   if (open) (menu.querySelector('[aria-checked="true"]') || menu.querySelector("button")).focus();
 }
 mb.onclick = e => {e.stopPropagation(); openMenu(menu.hidden);};
-menu.querySelectorAll("button").forEach(b => b.onclick = () => {openMenu(false); setMode(b.dataset.mode); mb.focus(); toast(b.dataset.mode === DAILY ? "Normal: today's daily puzzle" : `${MODES[b.dataset.mode].label}: practice mode`);});
+menu.querySelectorAll("button").forEach(b => b.onclick = () => {openMenu(false); setMode(b.dataset.mode); mb.focus(); toast(b.dataset.mode === DAILY ? "Full Toss: today's daily puzzle" : `${MODES[b.dataset.mode].label}: practice mode`);});
 menu.addEventListener("keydown", e => {
   const items = [...menu.querySelectorAll("button")], i = items.indexOf(document.activeElement);
   if (e.key === "ArrowDown") {items[(i + 1) % items.length].focus(); e.preventDefault();}
