@@ -69,3 +69,21 @@ Match data comes from [Cricsheet](https://cricsheet.org), released under the Ope
 - `index.html` is the home page (copied from `src/home.html`). It shows a short overview and a play button for each game.
 - `player/index.html` is the Guess the Player game (built from `src/template.html`). It links back to the home page with the logo and the home icon, and accepts `?mode=normal|medium|hard|decade|season`.
 - To add a game: put it in its own folder (for example `scorecard/index.html`) and add an entry to the `GAMES` list near the top of the script in `src/home.html`. Keep localStorage keys under `crickdle:` with a prefix of your own for the new game.
+
+## Archive
+The Archive button opens a calendar of every puzzle since Puzzle #1 (23 Nov 2026) for the current mode. Tap a date to play it. Each mode keeps a history in `localStorage` under `crickdle:hist:<mode>`: one entry per puzzle day, `{g: [player ids], done, won, a: 1}` where `a` marks a game played from the archive after its day. Stats and streaks are worked out from this history and count only games played on their own day.
+
+## Google sign-in (optional)
+Sign-in uses Google Firebase (free Spark plan). It stays switched off, with no account button, until you add your project's settings.
+
+1. Go to https://console.firebase.google.com, click **Create a project**, name it `crickdle`, and turn Google Analytics off (not needed).
+2. **Build → Authentication → Get started → Sign-in method → Google → Enable**. Pick a support email and save.
+3. **Authentication → Settings → Authorized domains → Add domain**: `nannukalapala2004-svg.github.io` (and your custom domain later).
+4. **Build → Firestore Database → Create database**. Choose a location near your players (for India, `asia-south1` Mumbai) and start in **production mode**.
+5. In Firestore, open the **Rules** tab, replace everything with the contents of `firestore.rules` from this repository, and click **Publish**.
+6. **Project settings (gear icon) → General → Your apps → Web (`</>`)**. Register an app called `crickdle` (no Hosting). Copy the `firebaseConfig` object it shows.
+7. In `src/template.html` (or `player/index.html`), replace `const FIREBASE_CONFIG = null;` with `const FIREBASE_CONFIG = { ...the object you copied... };`, rebuild with `python3 scripts/build_site.py` and publish.
+
+The web config (apiKey and so on) is not a secret: it only identifies the project. The Firestore rules are what keep each player's history private to them.
+
+Each signed-in player has one document, `users/<their uid>`, holding `{hist: {<mode>: {<day>: entry}}, updated}`. On sign-in the device's history and the account's history are merged (a finished game beats an unfinished one; a game counts as daily if any device played it on its day). After that, every guess is saved to the account.

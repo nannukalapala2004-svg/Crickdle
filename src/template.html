@@ -142,6 +142,34 @@ td:first-child{font-weight:600;color:var(--ink)}
 footer p{margin:0 0 6px}footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 footer a,.guide a{color:inherit;text-decoration-color:var(--gold);text-underline-offset:3px}
 dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(540px,92vw);width:100%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.ib[hidden]{display:none}
+.dnote{margin:-4px 0 14px;color:var(--muted);font-size:14px}
+.cal{margin:0 0 16px}.cal h3{margin:0 0 8px;font-size:15px;font-weight:600}
+.cal .wk,.cal .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal .wk span{font-size:11.5px;color:var(--muted);text-align:center;font-weight:500}
+.cal .days button,.cal .days span{aspect-ratio:1;max-height:46px;border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.cal .days span{color:light-dark(#b9bdd0,#3a4166);font-weight:500}
+.cal .days button{cursor:pointer;border:1px solid var(--line);background:var(--surface-2);color:var(--ink)}
+.cal .days button:hover{border-color:var(--gold)}
+.cal .days .won{background:var(--hit);border-color:var(--hit);color:#fff}.cal .days .lost{background:var(--miss);border-color:var(--miss);color:#fff}
+.cal .days .on{background:var(--close);border-color:var(--close);color:var(--close-ink)}
+.cal .days .today{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--gold)}
+.cal .days .cur{outline:2px dashed var(--gold);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:12px;height:12px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line)}
+.legend .won{background:var(--hit);border-color:var(--hit)}.legend .lost{background:var(--miss);border-color:var(--miss)}.legend .on{background:var(--close);border-color:var(--close)}
+.archbar{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.archbar button{font:inherit;font-size:13px;font-weight:600;color:var(--gold-lo);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+:root[data-theme=dark] .archbar button{color:var(--gold-hi)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .archbar button{color:var(--gold-hi)}}
+#bAcct{position:relative;overflow:hidden}#bAcct img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.acct{display:flex;align-items:center;gap:14px;margin:4px 0 16px}
+.acct .av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:20px;color:var(--gold-ink);background:linear-gradient(180deg,var(--gold-hi),var(--gold));overflow:hidden}
+.acct .av img{width:100%;height:100%;object-fit:cover}
+.acct b{display:block}.acct small{color:var(--muted)}
+.gbtn{display:inline-flex;align-items:center;gap:10px}.gbtn svg{width:18px;height:18px;background:#fff;border-radius:50%;padding:2px}
+.dnote a{color:inherit;text-decoration-color:var(--gold);text-underline-offset:3px}
+.linkbtn{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;padding:0;margin-top:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 dialog::backdrop{background:rgb(4 7 24/.6);backdrop-filter:blur(4px)}
 .dlg{padding:26px 24px 22px;position:relative}
 .dlg h2{margin:0 0 12px;font:700 24px/1.2 Poppins,sans-serif;letter-spacing:-.02em;padding-right:40px}
@@ -168,6 +196,8 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
 @media(max-width:480px){html:not(.more) .heads,html:not(.more) .tiles{grid-template-columns:minmax(0,2.1fr) repeat(6,minmax(0,1fr));gap:4px}html:not(.more) .tile b{font-size:12px;letter-spacing:-.02em}html:not(.more) .arr{font-size:.65em;margin-left:0}html:not(.more) .heads{font-size:10.5px}html:not(.more) .heads .full{display:none}html:not(.more) .heads .short{display:inline}.tile.nm{padding:0 7px}.tile.nm b{font-size:12px}}
 @media(max-width:600px){table{font-size:14px}.stack thead{display:none}.stack tr{display:grid;padding-block:12px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:6.5em;text-align:start;white-space:normal}.stack td::before{content:attr(data-l);float:inline-start;width:6em;margin-inline-start:-6.5em;color:var(--muted);font-weight:400}.stack td:first-child{padding-inline-start:0;font-size:16px}.stack td:first-child::before{display:none}.modes-t.stack td{text-align:start}
   .toolbar{align-items:stretch}.chips{width:100%}.chips .tb{flex:1;justify-content:center}}
+@media(max-width:480px){.chips .tb{font-size:13px;padding:8px 10px;gap:6px;white-space:nowrap}.chips{gap:6px}}
+@media(max-width:380px){.mark h1{font-size:22px}.icons{gap:4px}.ib{width:36px!important;height:36px!important}.ib svg{width:18px;height:18px}}
 @media(max-width:480px){.mark h1{font-size:25px}.ball{width:30px;height:30px}.icons{gap:6px}.ib{width:40px;height:40px}.board{padding:12px 8px 14px;border-radius:18px}.tile{border-radius:8px}.guide h2{font-size:24px}}
 @media(max-width:380px){html:not(.more) .tile b{font-size:11px}}
 </style>
@@ -183,6 +213,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
     </a>
     <div class="icons">
       <a class="ib" href="../" aria-label="Home" title="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9v10.5h4.5v-6h4v6h4.5V9"/></svg></a>
+      <button class="ib" id="bAcct" type="button" aria-label="Account" title="Sign in to save your history" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg><img id="acctPic" alt="" hidden referrerpolicy="no-referrer"></button>
       <a class="ib" href="#how" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2.3-2.6 4"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/></svg></a>
       <button class="ib" id="bStats" type="button" aria-label="Statistics" title="Statistics"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="7" width="4" height="13" rx="1.2"/><rect x="16" y="3.5" width="4" height="16.5" rx="1.2"/></svg></button>
       <button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
@@ -197,6 +228,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
       <div class="modemenu" id="modeMenu" role="menu" aria-label="Game mode" hidden></div>
     </div>
     <div class="chips">
+      <button class="tb" id="bArch" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Archive</button>
       <button class="tb" id="bPractice" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Practice</button>
       <button class="tb" id="bMore" type="button" aria-pressed="false" title="Hide Debut, Matches, Top score, Best bowling and Titles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/></svg>Less stats</button>
     </div>
@@ -317,7 +349,8 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li>In Normal and Medium you can only guess players with enough matches for that mode (50+ or 20+). In the other modes you can guess any IPL player. The answer always comes from the selected mode's pool.</li>
         <li>You can't guess the same player twice in one game.</li>
         <li>Practice games are random and don't count towards your stats or streaks.</li>
-        <li>Stats and streaks are saved per mode on this device only. Clearing your browser data resets them.</li>
+        <li>Missed a day? Open the <b>Archive</b> to play any earlier puzzle. Archive games don't count towards your streak.</li>
+        <li id="ruleSave">Stats and streaks are saved per mode on this device only. Clearing your browser data resets them.</li>
         <li>Stats include every IPL match from 2008 to 2026, including playoffs. Super overs are left out.</li>
       </ul>
     </section>
@@ -333,7 +366,8 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
 
     <section id="privacy">
       <h2>Privacy</h2>
-      <p>Crickdle has no accounts, no ads, no analytics and no cookies. Your guesses, streaks and settings are saved only in your own browser's local storage, and nothing is sent to us. Clearing your browser data resets them.</p>
+      <p>Crickdle has no ads and no analytics. Unless you sign in, your guesses, streaks and settings are saved only in your own browser's local storage, and nothing is sent to us. Clearing your browser data resets them.</p>
+      <p id="privSignIn" hidden>Signing in is optional. If you sign in with Google, your Google account name, email address and photo, and your Crickdle game history, are stored with Google Firebase so you can use them on other devices. Only you can read your history. You can delete it at any time from the account button, and signing out stops syncing.</p>
       <p>The game shows public sporting records about professional cricketers: names, countries, teams, match stats and ages. If you are a player featured here and want something corrected or removed, please get in touch<span id="privContact" hidden> at <a id="privLink" href="#"></a></span>.</p>
     </section>
   </div>
@@ -354,12 +388,30 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
   <textarea id="shareBox" hidden readonly aria-label="Result to copy"></textarea>
 </div></dialog>
 
+<dialog id="dArch" aria-labelledby="archTitle"><div class="dlg">
+  <button class="x" type="button" aria-label="Close" data-close>×</button>
+  <h2 id="archTitle">Archive</h2>
+  <p class="dnote" id="archNote"></p>
+  <div id="archCal"></div>
+  <p class="legend" aria-hidden="true"><span><i class="won"></i>Solved</span><span><i class="lost"></i>Missed</span><span><i class="on"></i>Started</span><span><i></i>Not played</span></p>
+</div></dialog>
+
+<dialog id="dAcct" aria-labelledby="acctTitle"><div class="dlg">
+  <button class="x" type="button" aria-label="Close" data-close>×</button>
+  <h2 id="acctTitle">Your account</h2>
+  <div id="acctBody"></div>
+</div></dialog>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 {
 // Set this to your email to show the "report a mistake" line in About and the footer.
 const CONTACT_EMAIL = "";
+// Google sign-in (saves history to the player's account). Paste your Firebase web app config here to switch it on,
+// e.g. {apiKey:"...", authDomain:"your-project.firebaseapp.com", projectId:"your-project", appId:"..."}. See README.
+const FIREBASE_CONFIG = null;
+const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/13.2.0/";
 const RAW = /*__DATA__*/[];
 // Simplified flag drawings (inline SVG, so they show on every device; emoji flags don't on Windows)
 const F = (body) => `<svg class="flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false">${body}</svg>`;
@@ -407,6 +459,10 @@ const bbText = p => p.bw < 0 ? "–" : `${p.bw}/${p.br}`;
 
 function rng(seed){return () => {seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296;};}
 function shuffled(list, seed){const o = [...list].sort((a, b) => a.id < b.id ? -1 : 1), r = rng(seed); for (let i = o.length - 1; i > 0; i--) {const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]];} return o;}
+function answerFor(m, d){const o = MODES[m].order; return o[((d % o.length) + o.length) % o.length];}
+// day number <-> calendar date (local); day 0 = Puzzle #1 = 23 Nov 2026
+const dateOf = d => {const x = new Date(EPOCH + d * 864e5); return new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate());};
+const dateText = d => dateOf(d).toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"});
 function today(){const n = new Date(); return Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 864e5);}
 const DAY = today();
 // age today (or at death); year-only birth dates are treated as 1 July
@@ -421,7 +477,7 @@ function ageOf(p){
 }
 for (const p of P) p.age = ageOf(p);
 const ageText = p => p.age == null ? "?" : p.age + (p.died ? "†" : "");
-for (const k in MODES) {const M = MODES[k], o = shuffled(M.pool, M.seed); M.daily = o[((DAY % o.length) + o.length) % o.length];}
+for (const k in MODES) {const M = MODES[k]; M.order = shuffled(M.pool, M.seed); M.daily = answerFor(k, DAY);}
 $("#modeRows").innerHTML = Object.values(MODES).map(M => `<tr><td>${M.label}</td><td>${M.who}</td><td>${M.pool.length}</td><td>${M.only ? "Only players in this mode" : "Any IPL player"}</td></tr>`).join("");
 
 const store = {
@@ -439,21 +495,50 @@ if (store.get("schema", 1) < 3) {
   store.set("schema", 3);
 }
 
-const blankStats = () => ({played:0, wins:0, streak:0, best:0, dist:[0,0,0,0,0,0,0,0], last:null});
 let mode = MODES[store.get("mode", "normal")] ? store.get("mode", "normal") : "normal";
 {const q = new URLSearchParams(location.search).get("mode"); if (MODES[q]) {mode = q; store.set("mode", q);}}
-let practice = false, answer, guesses = [], done = false, won = false, stats;
+let practice = false, play = DAY, answer, guesses = [], done = false, won = false;
 if (store.get("cb", false)) {document.documentElement.classList.add("cb"); $("#cbMode").checked = true;}
 
-function loadDaily(){
-  answer = MODES[mode].daily; practice = false;
-  const s = store.get("day:" + mode, null);
-  if (s && s.day === DAY) {guesses = s.g.filter(id => byId.has(id)); done = s.done; won = s.won;}
+/* History: one entry per mode per puzzle day, {g:[player ids], done, won, a:1 if played from the archive after its day}.
+   Stats and streaks are worked out from it, so it is the only thing that needs saving or syncing. */
+const hist = {};
+for (const k in MODES) {
+  hist[k] = store.get("hist:" + k, null) || {};
+  const old = store.get("day:" + k, null);           // progress saved before the archive existed
+  if (old && old.g && old.g.length && !hist[k][old.day]) hist[k][old.day] = {g:old.g, done:old.done, won:old.won};
+  store.del("day:" + k); store.set("hist:" + k, hist[k]);
+}
+function statsFor(m){
+  const h = hist[m], s = {played:0, wins:0, streak:0, best:0, dist:[0,0,0,0,0,0,0,0]};
+  const daily = Object.keys(h).map(Number).filter(d => h[d].done && !h[d].a).sort((a, b) => a - b);
+  let run = 0, prev = null;
+  for (const d of daily) {
+    const e = h[d]; s.played++;
+    if (e.won) {s.wins++; s.dist[e.g.length - 1]++; run = prev === d - 1 && run ? run + 1 : 1; s.best = Math.max(s.best, run);}
+    else run = 0;
+    prev = d;
+  }
+  const last = daily[daily.length - 1];
+  s.streak = last != null && last >= DAY - 1 && h[last].won ? run : 0;
+  return s;
+}
+function loadDay(d){
+  play = Math.min(d, DAY); practice = false; answer = answerFor(mode, play);
+  const e = hist[mode][play];
+  if (e) {guesses = e.g.filter(id => byId.has(id)); done = e.done; won = e.won;}
   else {guesses = []; done = false; won = false;}
-  stats = store.get("stats:" + mode, blankStats());
   $("#bPractice").setAttribute("aria-pressed", "false");
 }
-function save(){if (!practice) store.set("day:" + mode, {day:DAY, g:guesses, done, won});}
+const loadDaily = () => loadDay(DAY);
+function save(){
+  if (practice) return;
+  const prev = hist[mode][play], e = {g:guesses, done, won};
+  if (prev ? prev.a : play < DAY) e.a = 1;
+  hist[mode][play] = e; store.set("hist:" + mode, hist[mode]);
+  sync.push(mode, play, e);
+}
+const sync = {push(){}};   // replaced by the Google sign-in code when it is switched on
 
 function numCell(k, gv, av, text){
   if (gv === av) return {v:text, s:"hit"};
@@ -491,7 +576,10 @@ function render(newest){
   if (newest) setTimeout(() => document.querySelectorAll(".row.new").forEach(r => r.classList.remove("new")), 1700);
   const pips = `<span class="pips" aria-hidden="true">${Array.from({length:MAX}, (_, i) => `<i class="${i < guesses.length ? "used" : ""}"></i>`).join("")}</span>`;
   $("#left").innerHTML = done ? `<b style="color:var(--ink)">${won ? `Got it in ${guesses.length}` : "Out of guesses"}</b>` : `${pips}<span><b style="color:var(--ink)">${MAX - guesses.length}</b> left</span><span class="vh">${MAX - guesses.length} guesses left</span>`;
-  $("#mode").textContent = practice ? `Practice: a random ${MODES[mode].label} player` : `Puzzle #${DAY + 1}`;
+  $("#mode").innerHTML = practice ? `Practice: a random ${MODES[mode].label} player`
+    : play < DAY ? `<span class="archbar"><span>Archive: Puzzle #${play + 1}, ${dateText(play)}</span><button type="button" id="bToday">Back to today</button></span>`
+    : `Puzzle #${DAY + 1}`;
+  const bt = $("#bToday"); if (bt) bt.onclick = () => {loadDaily(); render(false); toast("Today's puzzle");};
   $("#modeNote").textContent = `${MODES[mode].label} mode: ${MODES[mode].who.charAt(0).toLowerCase() + MODES[mode].who.slice(1)} (${MODES[mode].pool.length}).${MODES[mode].only ? " Only these players can be guessed." : " Any IPL player can be guessed."}`;
   $("#modeLabel").textContent = MODES[mode].label;
   $("#bMode").setAttribute("aria-label", `Game mode: ${MODES[mode].label}. Change mode`);
@@ -534,7 +622,6 @@ function pick(p){
   $("#q").value = ""; hits = []; drawList();
   if (p.id === answer.id) {done = true; won = true;}
   else if (guesses.length >= MAX) done = true;
-  if (done && !practice) record();
   save(); render(true);
   if (done) setTimeout(() => showStats(true), matchMedia("(prefers-reduced-motion: reduce)").matches ? 200 : 1100);
   else $("#q").focus();
@@ -549,26 +636,20 @@ $("#q").addEventListener("keydown", e => {
 $("#list").addEventListener("mousedown", e => {const li = e.target.closest("li[data-i]"); if (li) {e.preventDefault(); pick(hits[+li.dataset.i]);}});
 document.addEventListener("click", e => {if (!e.target.closest(".search")) {hits = []; drawList();}});
 
-function record(){
-  stats.played++;
-  if (won) {stats.wins++; stats.dist[guesses.length - 1]++; stats.streak = stats.last === DAY - 1 ? stats.streak + 1 : 1; stats.best = Math.max(stats.best, stats.streak); stats.last = DAY;}
-  else stats.streak = 0;
-  store.set("stats:" + mode, stats);
-}
 function shareText(){
   const E = {hit:"🟩", close:"🟨", miss:"🟥", unk:"⬜"};
   const grid = guesses.map(id => compare(byId.get(id), answer).filter((c, i) => moreOn() || !EXTRA.has(COLS[i])).map(c => E[c.s]).join("")).join("\n");
-  return `Crickdle ${practice ? "practice" : "#" + (DAY + 1)} (${MODES[mode].label}) ${won ? guesses.length : "X"}/${MAX}\n${grid}${/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : ""}`;
+  return `Crickdle ${practice ? "practice" : "#" + (play + 1)} (${MODES[mode].label}) ${won ? guesses.length : "X"}/${MAX}\n${grid}${/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : ""}`;
 }
 function countdown(){const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const s = Math.floor((m - n) / 1000); return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m`;}
 function showStats(withResult){
-  const r = withResult && done, a = answer;
+  const r = withResult && done, a = answer, stats = statsFor(mode);
   $("#resTitle").textContent = r ? (won ? "Well played" : "Bowled out") : `${MODES[mode].label} mode statistics`;
-  $("#resBody").innerHTML = r ? `<div class="reveal"><span>${won ? "The player was" : "Today's player was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${CNAME[a.c] || a.c}, ${ROLE[a.r]}${a.age != null ? `, ${a.died ? "died aged " + a.age : "age " + a.age}` : ""}. ${a.m} matches for ${a.ts.join(", ")}. ${a.ru} runs, top score ${hsText(a)}. ${a.w} wickets${a.bw >= 0 ? `, best ${bbText(a)}` : ""}.</span></div>${practice ? "" : `<p>Next player in ${countdown()}. Try another mode while you wait.</p>`}` : "";
+  $("#resBody").innerHTML = r ? `<div class="reveal"><span>${won || play < DAY || practice ? "The player was" : "Today's player was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${CNAME[a.c] || a.c}, ${ROLE[a.r]}${a.age != null ? `, ${a.died ? "died aged " + a.age : "age " + a.age}` : ""}. ${a.m} matches for ${a.ts.join(", ")}. ${a.ru} runs, top score ${hsText(a)}. ${a.w} wickets${a.bw >= 0 ? `, best ${bbText(a)}` : ""}.</span></div>${practice ? "" : `<p>Next player in ${countdown()}. Try another mode while you wait.</p>`}` : "";
   const pct = stats.played ? Math.round(stats.wins / stats.played * 100) : 0;
   $("#statNums").innerHTML = [[stats.played, "Played"], [pct, "Win %"], [stats.streak, "Streak"], [stats.best, "Best streak"]].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("");
   const top = Math.max(1, ...stats.dist);
-  $("#dist").innerHTML = `<p style="margin:0 0 4px;font-weight:700">Guesses to win (${MODES[mode].label} daily games)</p>` + stats.dist.map((v, i) => `<div><span style="width:1em">${i + 1}</span><i class="${r && won && !practice && guesses.length === i + 1 ? "me" : ""}" style="width:${Math.max(8, v / top * 100)}%">${v}</i></div>`).join("");
+  $("#dist").innerHTML = `<p style="margin:0 0 4px;font-weight:700">Guesses to win (${MODES[mode].label} daily games)</p>` + stats.dist.map((v, i) => `<div><span style="width:1em">${i + 1}</span><i class="${r && won && !practice && guesses.length === i + 1 && play === DAY ? "me" : ""}" style="width:${Math.max(8, v / top * 100)}%">${v}</i></div>`).join("");
   $("#resActs").innerHTML = (r ? `<button class="btn" id="bShare" type="button">Copy result</button>` : "") + `<button class="btn ghost" id="bNew" type="button">${practice ? "New practice player" : "Play practice"}</button>`;
   $("#shareBox").hidden = true;
   const bs = $("#bShare");
@@ -587,7 +668,7 @@ function startPractice(){
   answer = a; guesses = []; done = false; won = false; render(false); $("#q").focus();
 }
 function setMode(m){
-  if (m === mode && !practice) return;
+  if (m === mode && !practice && play === DAY) return;
   mode = m; store.set("mode", m); loadDaily(); render(false);
 }
 let tt;
@@ -627,6 +708,127 @@ document.addEventListener("click", e => {if (!menu.hidden && !e.target.closest("
 $("#cbMode").onchange = e => {document.documentElement.classList.toggle("cb", e.target.checked); store.set("cb", e.target.checked);};
 document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => b.closest("dialog").close());
 document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => {if (e.target === d) d.close();}));
+
+// ---------- Archive ----------
+function drawArchive(){
+  const h = hist[mode];
+  $("#archNote").textContent = `${MODES[mode].label} mode. Tap a date to play that day's puzzle. Archive games don't change your streak.`;
+  let html = "", y = dateOf(DAY).getFullYear(), mo = dateOf(DAY).getMonth();
+  const first = dateOf(0);
+  while (y > first.getFullYear() || (y === first.getFullYear() && mo >= first.getMonth())) {
+    const start = new Date(y, mo, 1), n = new Date(y, mo + 1, 0).getDate(), pad = (start.getDay() + 6) % 7;
+    let cells = "<span></span>".repeat(pad);
+    for (let day = 1; day <= n; day++) {
+      const dt = new Date(y, mo, day), d = Math.round((Date.UTC(y, mo, day) - EPOCH) / 864e5);
+      if (d < 0 || d > DAY) {cells += `<span>${day}</span>`; continue;}
+      const e = h[d], st = !e ? "" : e.done ? (e.won ? "won" : "lost") : e.g.length ? "on" : "";
+      const label = `${dt.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"})}, Puzzle #${d + 1}${st === "won" ? ", solved in " + e.g.length : st === "lost" ? ", missed" : st === "on" ? ", started" : ""}`;
+      cells += `<button type="button" data-d="${d}" class="${st}${d === DAY ? " today" : ""}${d === play && !practice ? " cur" : ""}" aria-label="${label}"${d === DAY ? ' aria-current="date"' : ""}>${day}</button>`;
+    }
+    html += `<section class="cal"><h3>${start.toLocaleDateString("en-GB", {month:"long", year:"numeric"})}</h3><div class="wk" aria-hidden="true">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(w => `<span>${w}</span>`).join("")}</div><div class="days">${cells}</div></section>`;
+    if (--mo < 0) {mo = 11; y--;}
+  }
+  $("#archCal").innerHTML = html;
+  $("#archCal").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const d = +b.dataset.d; $("#dArch").close(); loadDay(d); render(false);
+    toast(d === DAY ? "Today's puzzle" : `Puzzle #${d + 1}, ${dateText(d)}`);
+    if (done) showStats(true); else $("#q").focus();
+  });
+}
+$("#bArch").onclick = () => {drawArchive(); $("#dArch").showModal();};
+
+// ---------- Google sign-in (Firebase) ----------
+if (FIREBASE_CONFIG) {
+  const GLOGO = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+  let fb = null, user = null, ready = false;
+  const queue = {}; let timer = null;
+  // keep the better of two saved attempts at the same puzzle
+  const better = (a, b) => !a ? b : !b ? a : a.done !== b.done ? (a.done ? a : b) : (b.g.length > a.g.length ? b : a);
+  function merge(m, d, remote){
+    const local = hist[m][d], pick = better(local, remote);
+    const out = {g:pick.g, done:pick.done, won:pick.won};
+    if ((!local || local.a) && (!remote || remote.a)) out.a = 1;   // daily if either device played it on the day
+    return out;
+  }
+  async function load(){
+    if (fb) return fb;
+    const [app, auth, fs] = await Promise.all(["firebase-app.js", "firebase-auth.js", "firebase-firestore.js"].map(f => import(FIREBASE_SDK + f)));
+    const a = app.initializeApp(FIREBASE_CONFIG);
+    fb = {auth, fs, A:auth.getAuth(a), db:fs.getFirestore(a)};
+    return fb;
+  }
+  sync.push = (m, d, e) => {
+    if (!user || !ready) return;
+    (queue[m] ||= {})[d] = e;
+    clearTimeout(timer); timer = setTimeout(flush, 800);
+  };
+  async function flush(){
+    if (!user) return;
+    const body = {hist:{}, updated:Date.now()};
+    for (const m in queue) body.hist[m] = queue[m];
+    for (const m in queue) delete queue[m];
+    try {await fb.fs.setDoc(fb.fs.doc(fb.db, "users", user.uid), body, {merge:true});}
+    catch (e) {console.warn("Crickdle sync failed", e); toast("Couldn't save to your account. It's still saved on this device.");}
+  }
+  async function pullAndMerge(){
+    const snap = await fb.fs.getDoc(fb.fs.doc(fb.db, "users", user.uid));
+    const remote = (snap.exists() && snap.data().hist) || {}, up = {};
+    for (const m in MODES) {
+      const r = remote[m] || {}, days = new Set([...Object.keys(hist[m]), ...Object.keys(r)]);
+      for (const d of days) {
+        const e = merge(m, d, r[d]);
+        if (JSON.stringify(e) !== JSON.stringify(r[d])) (up[m] ||= {})[d] = e;
+        hist[m][d] = e;
+      }
+      store.set("hist:" + m, hist[m]);
+    }
+    if (Object.keys(up).length) await fb.fs.setDoc(fb.fs.doc(fb.db, "users", user.uid), {hist:up, updated:Date.now()}, {merge:true});
+    ready = true;
+    if (!practice) {loadDay(play); render(false);}
+  }
+  function drawAcct(){
+    const b = $("#acctBody");
+    if (!user) {
+      b.innerHTML = `<p class="dnote">Sign in to keep your guesses, streaks and archive on every device you play on.</p>
+        <button class="btn gbtn" id="bGoogle" type="button">${GLOGO}Sign in with Google</button>
+        <p class="dnote" style="margin:16px 0 0;font-size:13px">We only use your Google name, email and photo to show who's signed in. See <a href="#privacy" data-close>Privacy</a>.</p>`;
+      b.querySelector("a[data-close]").onclick = () => $("#dAcct").close();
+      $("#bGoogle").onclick = async () => {
+        try {await load(); await fb.auth.signInWithPopup(fb.A, new fb.auth.GoogleAuthProvider()); $("#dAcct").close();}
+        catch (e) {if (!/popup-closed|cancelled-popup/.test(e.code || "")) toast("Sign-in didn't work. Please try again."); console.warn(e);}
+      };
+    } else {
+      const name = user.displayName || user.email;
+      b.innerHTML = `<div class="acct"><span class="av">${user.photoURL ? `<img src="${user.photoURL}" alt="" referrerpolicy="no-referrer">` : (name || "?").charAt(0).toUpperCase()}</span><span><b></b><small></small></span></div>
+        <p class="dnote">${ready ? "Your history is saved to your account and syncs across devices." : "Syncing your history…"}</p>
+        <button class="btn ghost" id="bSignOut" type="button">Sign out</button><br>
+        <button class="linkbtn" id="bDelAcct" type="button">Delete my saved history from my account</button>`;
+      b.querySelector(".acct b").textContent = user.displayName || "";
+      b.querySelector(".acct small").textContent = user.email || "";
+      $("#bSignOut").onclick = async () => {await fb.auth.signOut(fb.A); $("#dAcct").close(); toast("Signed out. Your history stays on this device.");};
+      $("#bDelAcct").onclick = async () => {
+        if (!confirm("Delete your Crickdle history from your account? It stays on this device.")) return;
+        try {await fb.fs.deleteDoc(fb.fs.doc(fb.db, "users", user.uid)); await fb.auth.signOut(fb.A); $("#dAcct").close(); toast("Deleted from your account and signed out");}
+        catch (e) {toast("Couldn't delete. Please try again."); console.warn(e);}
+      };
+    }
+  }
+  const ab = $("#bAcct"); ab.hidden = false;
+  ab.onclick = () => {drawAcct(); $("#dAcct").showModal();};
+  load().then(() => fb.auth.onAuthStateChanged(fb.A, async u => {
+    user = u; ready = false;
+    $("#acctPic").hidden = !(u && u.photoURL); if (u && u.photoURL) $("#acctPic").src = u.photoURL;
+    ab.setAttribute("aria-label", u ? `Account: signed in as ${u.displayName || u.email}` : "Sign in to save your history");
+    ab.title = u ? "Your account" : "Sign in to save your history";
+    if (u) {
+      try {await pullAndMerge(); toast(`Signed in as ${u.displayName || u.email}`);}
+      catch (e) {console.warn(e); toast("Signed in, but couldn't load your saved history");}
+    }
+    if ($("#dAcct").open) drawAcct();
+  })).catch(e => {console.warn("Crickdle: sign-in unavailable", e); ab.hidden = true;});
+  $("#privSignIn").hidden = false;
+  $("#ruleSave").textContent = "Stats and streaks are saved per mode on this device. Sign in with Google to keep them in your account and use them on other devices.";
+}
 
 loadDaily(); render(false);
 if (done) showStats(true);
