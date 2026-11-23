@@ -229,7 +229,7 @@ details.fold[open]>summary{margin-bottom:14px}
 :root[data-theme=dark]{--bg:#090d20;--ink:#eef0fa;--muted:#9aa2c6;--surface:#111735;--surface-2:#171e42;--line:rgb(255 255 255/.08);--shadow:0 30px 70px -30px rgb(0 0 0/.8);--ld1:#c9cde4;--ld2:#3a4166}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#090d20;--ink:#eef0fa;--muted:#9aa2c6;--surface:#111735;--surface-2:#171e42;--line:rgb(255 255 255/.08);--shadow:0 30px 70px -30px rgb(0 0 0/.8);--ld1:#c9cde4;--ld2:#3a4166}}
 </style>
-<script>try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}let less=false;try{less=JSON.parse(localStorage.getItem("crickdle:less"))===true;}catch(e){}if(!less)document.documentElement.classList.add("more");</script>
+<script>/* dark by default; a saved choice from the theme button wins */document.documentElement.dataset.theme="dark";try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}let less=false;try{less=JSON.parse(localStorage.getItem("crickdle:less"))===true;}catch(e){}if(!less)document.documentElement.classList.add("more");</script>
 <script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
 </head>
 <body>
