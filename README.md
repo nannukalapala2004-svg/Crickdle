@@ -66,6 +66,6 @@ Match data comes from [Cricsheet](https://cricsheet.org), released under the Ope
 - Country flags are simplified inline SVG drawings (the `FLAG` map in the template). A new country needs a new entry there, or it shows the code without a flag.
 
 ## Site layout
-- `index.html` is the home page (copied from `src/home.html`). It lists the games and shows today's progress for each mode.
-- `player/index.html` is the Guess the Player game (built from `src/template.html`). It links back to the home page with the logo and the grid icon, and accepts `?mode=normal|medium|hard|decade|season`.
+- `index.html` is the home page (copied from `src/home.html`). It shows a short overview and a play button for each game.
+- `player/index.html` is the Guess the Player game (built from `src/template.html`). It links back to the home page with the logo and the home icon, and accepts `?mode=normal|medium|hard|decade|season`.
 - To add a game: put it in its own folder (for example `scorecard/index.html`) and add an entry to the `GAMES` list near the top of the script in `src/home.html`. Keep localStorage keys under `crickdle:` with a prefix of your own for the new game.
