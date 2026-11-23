@@ -113,7 +113,7 @@ const GAMES = [
     id: "player",
     href: "player/",
     tag: "Daily",
-    title: "Guess the Player",
+    title: "Player of the Day",
     blurb: "Guess the IPL player in 8 tries. Every guess shows how close you are on country, role, team, age and career stats. One daily puzzle, plus practice modes from IPL icons to every player since 2008.",
     // little board picture: one string per row; h = green, c = yellow, m = red, e = empty
     board: ["mmcmm", "chmch", "hhhhh"]
@@ -130,7 +130,7 @@ for (const g of GAMES) {
       <h2 id="t-${g.id}">${esc(g.title)}</h2>
       <p>${esc(g.blurb)}</p>
       <a class="play" href="${g.href}">Play today's puzzle</a>
-      <p class="today">Puzzle #${DAY + 1}. New player every day at <strong>12:00 AM</strong> your time. Next one in <strong class="next"></strong>.</p>
+      <p class="today">Player of the Day #${DAY + 1}. New player every day at <strong>12:00 AM</strong> your time. Next one in <strong class="next"></strong>.</p>
     </div>
     <div class="tiles" aria-hidden="true">${board}</div>
   </article>`;

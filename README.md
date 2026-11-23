@@ -9,11 +9,11 @@ There is one daily puzzle, in **Normal** mode (players with 50+ IPL matches, 187
 | Normal (daily) | 50+ IPL matches | 187 | Normal players only |
 | Medium | 20+ IPL matches | 348 | Medium players only |
 | Hard | every IPL player | 809 | any IPL player |
-| Iconic players | hand-picked legends in `data/iconic.txt` | 79 | Iconic players only |
+| Spot the Star | hand-picked legends in `data/iconic.txt` | 79 | Spot the Star players only |
 | 2026 season | played in IPL 2026 | 202 | any IPL player |
 
 - **Daily answer:** each day's player is an independent seeded random pick from the full Normal pool (no fixed cycle), so the same player can come up again on a later day, but never two days running. Day 0 = 23 Nov 2026 = Puzzle #1. Everyone gets the same player on the same local date.
-- **Iconic players:** edit `data/iconic.txt` (one name per line, spelled as in `data/players.json`) and rebuild. The build stops with an error if a name isn't found.
+- **Spot the Star** (mode key `iconic`): edit `data/iconic.txt` (one name per line, spelled as in `data/players.json`) and rebuild. The build stops with an error if a name isn't found.
 
 ## How it works
 
@@ -70,7 +70,7 @@ Match data comes from [Cricsheet](https://cricsheet.org), released under the Ope
 
 ## Site layout
 - `index.html` is the home page (copied from `src/home.html`). It shows a short overview and a play button for each game.
-- `player/index.html` is the Guess the Player game (built from `src/template.html`). It links back to the home page with the logo and the home icon, and accepts `?mode=normal|medium|hard|iconic|season`.
+- `player/index.html` is the Player of the Day game (built from `src/template.html`). It links back to the home page with the logo and the home icon, and accepts `?mode=normal|medium|hard|iconic|season`.
 - To add a game: put it in its own folder (for example `scorecard/index.html`) and add an entry to the `GAMES` list near the top of the script in `src/home.html`. Keep localStorage keys under `crickdle:` with a prefix of your own for the new game.
 
 ## Archive

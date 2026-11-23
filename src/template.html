@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wicketle</title>
-<meta name="description" content="Guess the IPL player in 8 tries. A new player every day, plus unlimited practice modes.">
+<title>Player of the Day – Wicketle</title>
+<meta name="description" content="Player of the Day: guess the IPL player in 8 tries. A new player every day, plus unlimited practice modes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -278,9 +278,9 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
     </section>
 
     <section id="how">
-      <h2>How to play</h2>
+      <h2>How to play Player of the Day</h2>
       <ol class="steps">
-        <li><b>Play the daily puzzle.</b> Normal mode has one player of the day, the same for everyone. For more games, tap the Mode button and pick Medium, Hard, Iconic players or 2026 season: these are practice modes with a new random player every game.</li>
+        <li><b>Play the daily puzzle.</b> Normal mode has one player of the day, the same for everyone. For more games, tap the Mode button and pick Medium, Hard, Spot the Star or 2026 season: these are practice modes with a new random player every game.</li>
         <li><b>Type at least two letters</b> of any IPL player's name, first name or surname, in the search box.</li>
         <li><b>Choose a player</b> from the list by tapping it, or with the arrow keys and Enter.</li>
         <li><b>Read the row.</b> Twelve tiles light up green, yellow or red under the column names at the top of the board, comparing your guess with the hidden player. On a phone, swipe the board sideways to see every column.</li>
@@ -317,7 +317,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <thead><tr><th>Mode</th><th>Who can be the answer</th><th>Players</th><th>Who you can guess</th></tr></thead>
         <tbody id="modeRows"></tbody>
       </table>
-      <p class="note">Only Normal has a daily puzzle and streak. In Normal, Medium and Iconic players, the search only lists players from that mode, so every guess is a recognisable name. In Hard and 2026 season you can guess any IPL player.</p>
+      <p class="note">Only Normal has a daily puzzle and streak. In Normal, Medium and Spot the Star, the search only lists players from that mode, so every guess is a recognisable name. In Hard and 2026 season you can guess any IPL player.</p>
     </section>
 
     <section id="tips">
@@ -348,7 +348,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
       <ul>
         <li>You get 8 guesses per puzzle.</li>
         <li>There is one daily puzzle, in Normal mode, the same for every player. It resets at midnight your local time. Each day's player is picked at random from all Normal players, so a player can come up again on a later day.</li>
-        <li>The other modes are practice modes with a random player every game. In Normal, Medium and Iconic players you can only guess players from that mode. In Hard and 2026 season you can guess any IPL player.</li>
+        <li>The other modes are practice modes with a random player every game. In Normal, Medium and Spot the Star you can only guess players from that mode. In Hard and 2026 season you can guess any IPL player.</li>
         <li>You can't guess the same player twice in one game.</li>
         <li>Practice games don't count towards your stats or streak.</li>
         <li>Missed a day? Open the <b>Archive</b> to play any earlier puzzle. Archive games don't count towards your streak.</li>
@@ -447,7 +447,7 @@ const MODES = {
   normal: {label:"Normal", who:"Players with 50 or more IPL matches", seed:20260550, pool:P.filter(p => p.m >= 50), only:true},
   medium: {label:"Medium", who:"Players with 20 or more IPL matches", pool:P.filter(p => p.m >= 20), only:true},
   hard: {label:"Hard", who:"Every player who has played an IPL match since 2008", pool:P},
-  iconic: {label:"Iconic players", who:"Legends and superstars of the IPL", pool:P.filter(p => ICONIC.has(p.id)), only:true},
+  iconic: {label:"Spot the Star", who:"Legends and superstars of the IPL", pool:P.filter(p => ICONIC.has(p.id)), only:true},
   season: {label:"2026 season", who:"Players who played in IPL 2026", pool:P.filter(p => p.ls === 2026)}
 };
 const COLS = ["n","c","r","t","age","d","m","ru","hs","w","bb","ti"];
@@ -594,8 +594,8 @@ function render(newest){
   $("#left").innerHTML = done ? `<b style="color:var(--ink)">${won ? `Got it in ${guesses.length}` : "Out of guesses"}</b>` : `${pips}<span><b style="color:var(--ink)">${MAX - guesses.length}</b> left</span><span class="vh">${MAX - guesses.length} guesses left</span>`;
   const pl = $("#bPractice .pl"); if (pl) pl.textContent = mode === DAILY ? "Practice" : "New player";
   $("#mode").innerHTML = practice ? (mode === DAILY ? "Practice: a random Normal player" : `${MODES[mode].label}: practice game`)
-    : play < DAY ? `<span class="archbar"><span>Archive: Puzzle #${play + 1}, ${dateText(play)}</span><button type="button" id="bToday">Back to today</button></span>`
-    : `Puzzle #${DAY + 1}`;
+    : play < DAY ? `<span class="archbar"><span>Archive: Player of the Day #${play + 1}, ${dateText(play)}</span><button type="button" id="bToday">Back to today</button></span>`
+    : `Player of the Day #${DAY + 1}`;
   const bt = $("#bToday"); if (bt) bt.onclick = () => {loadDaily(); render(false); toast("Today's puzzle");};
   $("#modeNote").textContent = `${MODES[mode].label} mode: ${MODES[mode].who.charAt(0).toLowerCase() + MODES[mode].who.slice(1)} (${MODES[mode].pool.length}).${MODES[mode].only ? " Only these players can be guessed." : " Any IPL player can be guessed."}`;
   $("#modeLabel").textContent = MODES[mode].label;
@@ -656,7 +656,7 @@ document.addEventListener("click", e => {if (!e.target.closest(".search")) {hits
 function shareText(){
   const E = {hit:"🟩", close:"🟨", miss:"🟥", unk:"⬜"};
   const grid = guesses.map(id => compare(byId.get(id), answer).filter((c, i) => moreOn() || !EXTRA.has(COLS[i])).map(c => E[c.s]).join("")).join("\n");
-  return `Wicketle ${practice ? `practice (${MODES[mode].label})` : "#" + (play + 1)} ${won ? guesses.length : "X"}/${MAX}\n${grid}${/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : ""}`;
+  return `Wicketle ${practice ? `practice (${MODES[mode].label})` : "Player of the Day #" + (play + 1)} ${won ? guesses.length : "X"}/${MAX}\n${grid}${/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : ""}`;
 }
 function countdown(){const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const s = Math.floor((m - n) / 1000); return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m`;}
 function showStats(withResult){
@@ -740,7 +740,7 @@ function drawArchive(){
       const dt = new Date(y, mo, day), d = Math.round((Date.UTC(y, mo, day) - EPOCH) / 864e5);
       if (d < 0 || d > DAY) {cells += `<span>${day}</span>`; continue;}
       const e = h[d], st = !e ? "" : e.done ? (e.won ? "won" : "lost") : e.g.length ? "on" : "";
-      const label = `${dt.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"})}, Puzzle #${d + 1}${st === "won" ? ", solved in " + e.g.length : st === "lost" ? ", missed" : st === "on" ? ", started" : ""}`;
+      const label = `${dt.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"})}, Player of the Day #${d + 1}${st === "won" ? ", solved in " + e.g.length : st === "lost" ? ", missed" : st === "on" ? ", started" : ""}`;
       cells += `<button type="button" data-d="${d}" class="${st}${d === DAY ? " today" : ""}${d === play && !practice ? " cur" : ""}" aria-label="${label}"${d === DAY ? ' aria-current="date"' : ""}>${day}</button>`;
     }
     html += `<section class="cal"><h3>${start.toLocaleDateString("en-GB", {month:"long", year:"numeric"})}</h3><div class="wk" aria-hidden="true">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(w => `<span>${w}</span>`).join("")}</div><div class="days">${cells}</div></section>`;
@@ -749,7 +749,7 @@ function drawArchive(){
   $("#archCal").innerHTML = html;
   $("#archCal").querySelectorAll("button").forEach(b => b.onclick = () => {
     const d = +b.dataset.d; $("#dArch").close(); loadDay(d); render(false);
-    toast(d === DAY ? "Today's puzzle" : `Puzzle #${d + 1}, ${dateText(d)}`);
+    toast(d === DAY ? "Today's Player of the Day" : `Player of the Day #${d + 1}, ${dateText(d)}`);
     if (done) showStats(true); else $("#q").focus();
   });
 }
