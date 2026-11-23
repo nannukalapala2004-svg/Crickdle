@@ -63,13 +63,13 @@ The game is a static site. Drag the folder (or just `index.html`) into Netlify D
 Match data comes from [Cricsheet](https://cricsheet.org), released under the Open Data Commons Attribution License (ODC-BY). Keep the credit line in the footer. Full names, countries, a few role overrides and most birth dates were added by hand. 132 birth dates are flagged `?` and 56 players have none. Rows marked `?` in `meta.tsv` are names worth double-checking.
 
 ## Publishing checklist
-- Set `CONTACT_EMAIL` near the top of the script in `src/template.html` (or directly in `index.html`) to show the corrections email in About, Privacy and the footer. It stays hidden while empty.
+- Open `config.js` (in the top folder, next to `index.html`) and set `contactEmail` to show the corrections email in About, Privacy and the footers. It stays hidden while empty. `config.js` holds the settings for the home page and every game; the build only creates it if it's missing, so your settings are never overwritten.
 - The About section and the footer credit Cricsheet (ODC-By) and the IPL-DATASET mirror (MIT), and state that Wicketle is unofficial and not affiliated with the IPL, BCCI or any team. Keep these when you change the page.
 - Birth dates flagged `?` in `data/dob_curated.tsv` are skipped by the build, so those players show a "?" age. To restore one, put a confirmed date in `dob_verified.tsv`.
 - Country flags are simplified inline SVG drawings (the `FLAG` map in the template). A new country needs a new entry there, or it shows the code without a flag.
 
 ## Site layout
-- `index.html` is the home page (copied from `src/home.html`). It shows a short overview and a play button for each game.
+- `index.html` is the home page (copied from `src/home.html`). It also holds the About and Privacy sections; the games link to them. It shows a short overview and a play button for each game.
 - `player/index.html` is the Player of the Day game (built from `src/template.html`). It links back to the home page with the logo and the home icon, and accepts `?mode=normal|medium|hard|iconic|season`.
 - To add a game: put it in its own folder (for example `scorecard/index.html`) and add an entry to the `GAMES` list near the top of the script in `src/home.html`. Keep localStorage keys under `crickdle:` with a prefix of your own for the new game.
 
@@ -85,7 +85,7 @@ Sign-in uses Google Firebase (free Spark plan). It stays switched off, with no a
 4. **Build → Firestore Database → Create database**. Choose a location near your players (for India, `asia-south1` Mumbai) and start in **production mode**.
 5. In Firestore, open the **Rules** tab, replace everything with the contents of `firestore.rules` from this repository, and click **Publish**.
 6. **Project settings (gear icon) → General → Your apps → Web (`</>`)**. Register an app called `wicketle` (no Hosting). Copy the `firebaseConfig` object it shows.
-7. In `src/template.html` (or `player/index.html`), replace `const FIREBASE_CONFIG = null;` with `const FIREBASE_CONFIG = { ...the object you copied... };`, rebuild with `python3 scripts/build_site.py` and publish.
+7. Open `config.js` and replace `firebase: null` with `firebase: { ...the object you copied... }`, then publish. No rebuild is needed.
 
 The web config (apiKey and so on) is not a secret: it only identifies the project. The Firestore rules are what keep each player's history private to them.
 
