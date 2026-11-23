@@ -125,7 +125,7 @@ dialog::backdrop{background:rgb(4 7 24/.6);backdrop-filter:blur(4px)}
 textarea{width:100%;margin-top:10px;min-height:110px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:10px}
 
 .guide{margin-top:40px}
-.guide section{padding-top:28px;margin-top:28px;border-top:1px solid var(--line)}
+.guide section{padding:16px 0;margin-top:22px;border-top:1px solid var(--line)}
 .guide h2{margin:0 0 12px;font-size:22px}
 .guide p,.guide li{max-width:66ch;color:light-dark(#2a3050,#c9cde4)}
 .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
@@ -144,6 +144,16 @@ footer p{margin:0 0 6px}footer a{text-decoration-color:var(--gold);text-underlin
 }
 @media(max-width:380px){.mark b{font-size:23px}.icons{gap:5px}.ib{width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* collapsible guide sections: heading + down arrow, closed by default */
+details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;border-radius:12px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary h2{margin:0!important}
+details.fold>summary::after{content:"";flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9ae5b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .2s}
+details.fold[open]>summary::after{transform:rotate(180deg)}
+details.fold>summary:hover::after{border-color:var(--gold)}
+details.fold>summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+details.fold[open]>summary{margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -200,12 +210,12 @@ footer p{margin:0 0 6px}footer a{text-decoration-color:var(--gold);text-underlin
 
   <div class="guide">
     <p class="legend" aria-hidden="true"><span><i style="background:var(--hit)"></i>Right team, right place</span><span><i style="background:var(--close)"></i>In his path, different place</span><span><i style="background:var(--miss)"></i>Not in his path</span></p>
-    <section id="how">
-      <h2>How to play Career Path</h2>
+    <section id="how"><details class="fold"><summary><h2>How to play Career Path</h2></summary>
       <p><b>Who's the player?</b> You see the career path of an IPL legend (the same players as Spot the Star): every franchise he played for, in order, with the seasons. You can only guess Spot the Star players. Guess who it is in 6 tries. Each guess shows that player's own path, coloured against the answer, and each wrong guess unlocks a new clue: country, role, matches, runs and wickets, then initials.</p>
       <p><b>Build the path.</b> You see the player. Fill in the franchise he played for in each stint, in order. The seasons are shown on each slot, and teams that didn't play in those seasons are greyed out. Press Check path: green is right, yellow means that team is in his path but somewhere else, red means he never played for them. You have 6 tries.</p>
       <p>Each game has one daily puzzle, the same for everyone, which resets at midnight your local time. Practice gives unlimited random players and doesn't count towards your stats.</p>
       <p>A path lists the seasons a player actually played IPL matches. Seasons spent in a squad without playing aren't included. Delhi Daredevils, Kings XI Punjab and Royal Challengers Bangalore appear under their current names (DC, PBKS, RCB); Deccan Chargers (DCH) are separate from Sunrisers Hyderabad.</p>
+      </details>
     </section>
   </div>
 
@@ -490,6 +500,15 @@ try {if (JSON.parse(localStorage.getItem("crickdle:cb"))) root.classList.add("cb
 load("guess"); load("build"); render();
 if (S[game].done) showRes(true);
 }
+
+// collapsible sections: open the one a link points to (e.g. the "?" button or the guide menu)
+function openFold(hash){
+  const el = hash && document.getElementById(hash.slice(1)), d = el && el.querySelector("details.fold");
+  if (d && !d.open) d.open = true;
+}
+openFold(location.hash);
+addEventListener("hashchange", () => openFold(location.hash));
+document.addEventListener("click", e => {const a = e.target.closest('a[href^="#"]'); if (a) openFold(a.getAttribute("href"));});
 </script>
 </body>
 </html>

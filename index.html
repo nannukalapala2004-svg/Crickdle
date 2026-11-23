@@ -69,7 +69,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .soon h2{margin:0;font-size:17px;color:var(--ink);font-weight:600}
 .soon p{margin:2px 0 0;font-size:14px}
 
-.info section{margin-top:44px;padding-top:30px;border-top:1px solid var(--line);scroll-margin-top:16px}
+.info section{padding:18px 0;border-top:1px solid var(--line);scroll-margin-top:16px}.info section:first-child{margin-top:40px}
 .info h2{margin:0 0 12px;font-size:24px;font-weight:700;letter-spacing:-.02em}
 .info p{max-width:66ch;color:light-dark(#2a3050,#c9cde4);margin:0 0 12px}
 .info a{text-decoration-color:var(--gold);text-underline-offset:3px}
@@ -84,6 +84,16 @@ footer a{text-decoration-color:var(--gold);text-underline-offset:3px}
   .play{width:100%;justify-content:center}
   .intro{margin:28px 0 20px}
 }
+
+/* collapsible guide sections: heading + down arrow, closed by default */
+details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;border-radius:12px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary h2{margin:0!important}
+details.fold>summary::after{content:"";flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9ae5b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .2s}
+details.fold[open]>summary::after{transform:rotate(180deg)}
+details.fold>summary:hover::after{border-color:var(--gold)}
+details.fold>summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+details.fold[open]>summary{margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -105,20 +115,20 @@ footer a{text-decoration-color:var(--gold);text-underline-offset:3px}
     <div class="games" id="games"></div>
 
     <div class="info">
-    <section id="about">
-      <h2>About</h2>
+    <section id="about"><details class="fold"><summary><h2>About</h2></summary>
       <p>Wicketle is an unofficial, fan-made home for daily cricket puzzles. Its first game, Player of the Day, covers all 809 players who have made an IPL playing XI.</p>
       <p><strong>Wicketle is not affiliated with, endorsed by or connected to the Indian Premier League, the BCCI, any IPL franchise or any player.</strong> IPL and team names are trademarks of their owners and are used only to describe the players' records.</p>
       <p>Match stats are computed ball by ball from <a href="https://cricsheet.org" rel="noopener">Cricsheet</a>'s IPL scorecards, used under the <a href="https://opendatacommons.org/licenses/by/1-0/" rel="noopener">Open Data Commons Attribution License</a>. We converted and summarised that data to make the game, so any errors are ours, not Cricsheet's. The match files were taken from the <a href="https://github.com/ritesh-ojha/IPL-DATASET" rel="noopener">IPL-DATASET</a> repository (MIT License), which republishes them.</p>
       <p>Full names, countries and birth dates were added from public sources. Birth dates we couldn't confirm are left out, and those players show a "?" for age in Player of the Day.</p>
       <p id="contactLine" hidden>Spotted a wrong name, country or age? Email <a id="contactLink" href="#"></a> and we'll fix it.</p>
+      </details>
     </section>
 
-    <section id="privacy">
-      <h2>Privacy</h2>
+    <section id="privacy"><details class="fold"><summary><h2>Privacy</h2></summary>
       <p>Wicketle has no ads and no analytics. Unless you sign in, your guesses, streaks and settings are saved only in your own browser's local storage, and nothing is sent to us. Clearing your browser data resets them.</p>
       <p id="privSignIn" hidden>Signing in is optional. If you sign in with Google, your Google account name, email address and photo, and your Wicketle game history, are stored with Google Firebase so you can use them on other devices. Only you can read your history. You can delete it at any time from the account button in the game, and signing out stops syncing.</p>
       <p>The game shows public sporting records about professional cricketers: names, countries, teams, match stats and ages. If you are a player featured here and want something corrected or removed, please get in touch<span id="privContact" hidden> at <a id="privLink" href="#"></a></span>.</p>
+      </details>
     </section>
     </div>
   </main>
@@ -212,6 +222,15 @@ const apply = t => {root.dataset.theme = t; btn.setAttribute("aria-pressed", t =
 apply(cur());
 btn.addEventListener("click", () => {const t = cur() === "dark" ? "light" : "dark"; apply(t); try{localStorage.setItem("crickdle:theme", JSON.stringify(t));}catch(e){}});
 }
+
+// collapsible sections: open the one a link points to (e.g. the "?" button or the guide menu)
+function openFold(hash){
+  const el = hash && document.getElementById(hash.slice(1)), d = el && el.querySelector("details.fold");
+  if (d && !d.open) d.open = true;
+}
+openFold(location.hash);
+addEventListener("hashchange", () => openFold(location.hash));
+document.addEventListener("click", e => {const a = e.target.closest('a[href^="#"]'); if (a) openFold(a.getAttribute("href"));});
 </script>
 </body>
 </html>

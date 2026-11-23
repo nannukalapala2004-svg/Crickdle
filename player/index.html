@@ -118,7 +118,7 @@ html.more .heads span.ex{display:block !important}html.more .tile b{font-size:cl
 .guide-nav{display:flex;gap:8px;overflow-x:auto;margin:34px 0 0;padding:4px 0}
 .guide-nav a{flex:none;font-size:13.5px;font-weight:500;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 16px;min-height:40px;display:inline-flex;align-items:center;background:var(--surface)}
 .guide-nav a:hover{border-color:var(--gold)}
-.guide section{padding:40px 0 8px;border-top:1px solid var(--line);margin-top:34px}
+.guide section{padding:18px 0;border-top:1px solid var(--line);margin-top:0}.guide section:first-of-type{margin-top:34px}
 .guide h2{margin:0 0 14px;font:700 28px/1.2 Poppins,sans-serif;letter-spacing:-.02em;text-wrap:balance}
 .guide h3{margin:24px 0 8px;font-size:16px;font-weight:600}
 .guide p,.guide li{max-width:66ch;color:light-dark(#2a3050,#c9cde4)}
@@ -207,6 +207,16 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
 @media(max-width:380px){.mark h1{font-size:22px}.icons{gap:4px}.ib{width:36px!important;height:36px!important}.ib svg{width:18px;height:18px}}
 @media(max-width:480px){.mark h1{font-size:25px}.ball{width:30px;height:30px}.icons{gap:6px}.ib{width:40px;height:40px}.board{padding:12px 8px 14px;border-radius:18px}.tile{border-radius:8px}.guide h2{font-size:24px}}
 @media(max-width:380px){html:not(.more) .tile b{font-size:11px}}
+
+/* collapsible guide sections: heading + down arrow, closed by default */
+details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;border-radius:12px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary h2{margin:0!important}
+details.fold>summary::after{content:"";flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9ae5b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .2s}
+details.fold[open]>summary::after{transform:rotate(180deg)}
+details.fold>summary:hover::after{border-color:var(--gold)}
+details.fold>summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+details.fold[open]>summary{margin-bottom:14px}
 </style>
 <script>try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}let less=false;try{less=JSON.parse(localStorage.getItem("crickdle:less"))===true;}catch(e){}if(!less)document.documentElement.classList.add("more");</script>
 <script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
@@ -265,8 +275,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
   </nav>
 
   <div class="guide">
-    <section id="colours">
-      <h2>Colour guide</h2>
+    <section id="colours"><details class="fold"><summary><h2>Colour guide</h2></summary>
       <div class="cg">
         <div><span class="tile hit"><b>CSK</b></span><p><b>Green means correct.</b> This attribute exactly matches the hidden player.</p></div>
         <div><span class="tile close"><b>4842<span class="arr">▲</span></b></span><p><b>Yellow means close or partly right.</b> A number is near the answer, a role overlaps (all-rounder against batter), the two players share a franchise, or the best bowling has the same number of wickets.</p></div>
@@ -280,10 +289,10 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li><b>†</b> after an age means the player has died; the age shown is their age at death.</li>
       </ul>
       <label class="chk"><input type="checkbox" id="cbMode"> Use colour-blind tiles (orange, blue and grey)</label>
+      </details>
     </section>
 
-    <section id="how">
-      <h2>How to play Player of the Day</h2>
+    <section id="how"><details class="fold"><summary><h2>How to play Player of the Day</h2></summary>
       <ol class="steps">
         <li><b>Play the daily puzzle.</b> Full Toss mode has one player of the day, the same for everyone. For more games, tap the Mode button and pick Good Length, Yorker, Spot the Star or 2026 season: these are practice modes with a new random player every game.</li>
         <li><b>Type at least two letters</b> of any IPL player's name, first name or surname, in the search box.</li>
@@ -295,10 +304,10 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li><b>Share your result</b> with Copy result. It copies a spoiler-free grid of coloured squares.</li>
         <li><b>Come back tomorrow.</b> A new player arrives at midnight your local time. Want more now? Pick Good Length, Yorker, Spot the Star or 2026 season from the Mode menu for unlimited random games.</li>
       </ol>
+      </details>
     </section>
 
-    <section id="attributes">
-      <h2>What each attribute means</h2>
+    <section id="attributes"><details class="fold"><summary><h2>What each attribute means</h2></summary>
       <p>Every number covers IPL matches only, from 2008 to the 2026 final. Columns marked “extra” are hidden when the Less stats switch at the top right of the board is on.</p>
       <table class="stack">
         <thead><tr><th>Attribute</th><th>What it shows</th><th>Yellow when</th></tr></thead>
@@ -323,10 +332,10 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <tbody id="modeRows"></tbody>
       </table>
       <p class="note">Only Full Toss has a daily puzzle and streak. In Full Toss, Good Length and Spot the Star, the search only lists players from that mode, so every guess is a recognisable name. In Yorker and 2026 season you can guess any IPL player.</p>
+      </details>
     </section>
 
-    <section id="tips">
-      <h2>Tips &amp; strategy</h2>
+    <section id="tips"><details class="fold"><summary><h2>Tips &amp; strategy</h2></summary>
       <h3>Wicketle tips</h3>
       <ul>
         <li><b>Open with a well-travelled player.</b> Someone who played for many franchises, like Dinesh Karthik or Aaron Finch, makes the Team tile turn yellow far more often, which quickly shows which franchises to focus on.</li>
@@ -346,10 +355,10 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li><b>Use the practice modes to learn the numbers.</b> Random games build a feel for who has how many runs and wickets.</li>
         <li><b>Play daily for your streak.</b> Your streak grows with every daily puzzle you solve on its day.</li>
       </ul>
+      </details>
     </section>
 
-    <section id="rules">
-      <h2>Rules</h2>
+    <section id="rules"><details class="fold"><summary><h2>Rules</h2></summary>
       <ul>
         <li>You get 8 guesses per puzzle.</li>
         <li>There is one daily puzzle, in Full Toss mode, the same for every player. It resets at midnight your local time. Each day's player is picked at random from all Full Toss players, so a player can come up again on a later day.</li>
@@ -360,6 +369,7 @@ textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border
         <li id="ruleSave">Stats and streaks are saved on this device only. Clearing your browser data resets them.</li>
         <li>Stats include every IPL match from 2008 to 2026, including playoffs. Super overs are left out.</li>
       </ul>
+      </details>
     </section>
 
   </div>
@@ -845,6 +855,15 @@ if (CONTACT_EMAIL) {
   }
 }
 }
+
+// collapsible sections: open the one a link points to (e.g. the "?" button or the guide menu)
+function openFold(hash){
+  const el = hash && document.getElementById(hash.slice(1)), d = el && el.querySelector("details.fold");
+  if (d && !d.open) d.open = true;
+}
+openFold(location.hash);
+addEventListener("hashchange", () => openFold(location.hash));
+document.addEventListener("click", e => {const a = e.target.closest('a[href^="#"]'); if (a) openFold(a.getAttribute("href"));});
 </script>
 </body>
 </html>
