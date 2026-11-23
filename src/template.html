@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crickdle</title>
+<meta name="description" content="Guess the IPL player in 8 tries. A new player every day in five modes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: premium night-match broadcast — calm, confident, expensive.
+   IDEA: the trophy-cabinet scoreboard; a midnight-navy case with gold trim where each guess lights up.
+   PICTURE: the board itself, a flat navy panel with a gold hairline and eight empty rows.
+   COLOUR and TYPE: midnight navy, porcelain, one metallic gold; emerald / amber / crimson feedback; Poppins 400–700.
+   LAYOUT: one centred column — slim header with icon buttons, game toolbar, search, board, guide. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#f6f7fb,#090d20);--ink:light-dark(#0b1030,#eef0fa);--muted:light-dark(#5b6283,#9aa2c6);
+  --surface:light-dark(#ffffff,#111735);--surface-2:light-dark(#eef0f7,#171e42);--line:light-dark(#dfe2ee,rgb(255 255 255/.08));
+  --board:#0f1534;--board-2:#0f1534;--chalk:#eef0fa;--slot:rgb(255 255 255/.045);--slot-line:rgb(255 255 255/.05);
+  --gold:#d9ae5b;--gold-hi:#f3d48a;--gold-lo:#b8862d;--gold-ink:#2a1d05;
+  --hit:#1fa463;--hit-2:#27c27a;--hit-ink:#fff;--close:#f2c14e;--close-2:#ffd977;--close-ink:#2b1f00;--miss:#c9343c;--miss-2:#e0474f;--miss-ink:#fff;
+  --shadow:light-dark(0 24px 60px -30px rgb(11 16 48/.45),0 30px 70px -30px rgb(0 0 0/.8))}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+:root.cb{--hit:#e0682a;--hit-2:#f5793a;--close:#6aaef0;--close-2:#85c0f9;--close-ink:#08223d;--miss:#4e5566;--miss-2:#5f6678}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--ink);font:15px/1.65 Poppins,system-ui,sans-serif;overflow-x:clip;-webkit-font-smoothing:antialiased;background:var(--bg)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.wrap{max-width:940px;margin:0 auto;padding:22px max(4vw,14px) 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:22px}
+.mark{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.mark h1{margin:0;font:700 30px/1 Poppins,sans-serif;letter-spacing:-.03em}
+.mark h1 span{background:linear-gradient(180deg,var(--gold-hi),var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ball{width:34px;height:34px;flex:none;filter:drop-shadow(0 6px 10px rgb(150 20 40/.35))}
+.icons{display:flex;gap:8px}
+.ib{width:44px;height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s;box-shadow:0 6px 16px -10px rgb(0 0 0/.4)}
+.ib:hover{border-color:var(--gold)}
+.ib svg{width:20px;height:20px}
+#bTheme .sun{display:none}#bTheme[aria-pressed=true] .sun{display:block}#bTheme[aria-pressed=true] .moon{display:none}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font-weight:500;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 16px;min-height:44px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--ink);transition:border-color .2s}
+.tb svg{width:16px;height:16px;opacity:.8}
+.tb:hover{border-color:var(--gold)}
+.tb[aria-pressed=true]{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--gold-ink);border-color:var(--gold)}
+.modewrap{position:relative}
+.modebtn{display:inline-flex;align-items:center;gap:10px;color:var(--chalk);border:1px solid transparent;border-radius:999px;padding:8px 16px 8px 8px;min-height:48px;cursor:pointer;font-weight:600;
+  background:var(--board);border-color:rgb(217 174 91/.45);box-shadow:0 10px 24px -14px rgb(7 11 36/.9)}
+.modebtn .mi{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,var(--gold-hi),var(--gold-lo));color:var(--gold-ink)}
+.modebtn svg{width:18px;height:18px}
+.modebtn small{display:block;font-size:11px;font-weight:500;line-height:1.1;color:var(--gold-hi);opacity:.9}
+.modebtn .lb{text-align:left;line-height:1.15}
+.modebtn .car{font-size:10px;opacity:.7;transition:transform .2s}
+.modebtn[aria-expanded=true] .car{transform:rotate(180deg)}
+.modemenu{position:absolute;top:calc(100% + 8px);left:0;z-index:15;width:min(360px,calc(100vw - 28px));background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:6px}
+.modemenu[hidden]{display:none}
+.modemenu button{display:grid;grid-template-columns:20px minmax(0,1fr);gap:2px 10px;width:100%;text-align:left;background:transparent;border:0;border-radius:10px;padding:11px 12px;cursor:pointer;min-height:44px}
+.modemenu button:hover,.modemenu button:focus-visible{background:var(--surface-2)}
+.modemenu .dot{width:12px;height:12px;border-radius:999px;border:1.5px solid var(--muted);margin-top:5px}
+.modemenu button[aria-checked=true] .dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 3px rgb(217 174 91/.25)}
+.modemenu b{font-size:15px;font-weight:600}
+.modemenu small{grid-column:2;color:var(--muted);font-size:13px;line-height:1.4}
+.sub{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;font-size:14px;color:var(--muted)}
+.sub #mode{color:var(--ink);font-weight:600}
+.modenote{margin:2px 0 0;color:var(--muted);font-size:13px}
+.left{display:flex;align-items:center;gap:10px}
+.pips{display:flex;gap:5px}
+.pips i{width:9px;height:9px;border-radius:999px;background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 0 0 1px rgb(217 174 91/.3)}
+.pips i.used{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.search{position:relative;margin-bottom:18px}
+.search svg{position:absolute;left:18px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{width:100%;font-size:16px;padding:16px 18px 16px 50px;border-radius:16px;border:1px solid var(--line);background:var(--surface);box-shadow:0 12px 30px -22px rgb(7 11 36/.6);transition:border-color .2s,box-shadow .2s}
+.search input::placeholder{color:var(--muted)}
+.search input:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 4px rgb(217 174 91/.18),0 12px 30px -22px rgb(7 11 36/.6)}
+.search input:disabled{opacity:.6}
+#list{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;margin:0;padding:6px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);max-height:360px;overflow-y:auto}
+#list:empty{display:none}
+#list li{display:flex;justify-content:space-between;gap:10px;padding:11px 12px;border-radius:10px;cursor:pointer;font-weight:500}
+#list li[aria-selected=true],#list li:hover{background:var(--surface-2)}
+#list small{color:var(--muted);white-space:nowrap;font-weight:400}
+.board{color:var(--chalk);border-radius:22px;padding:16px 14px 18px;background:var(--board);border:1px solid rgb(217 174 91/.28);box-shadow:var(--shadow)}
+.bscroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgb(217 174 91/.5) transparent}
+.heads,.tiles{display:grid;grid-template-columns:minmax(0,1.9fr) repeat(6,minmax(0,1fr));gap:6px}
+.ex{display:none !important}
+html.more .heads,html.more .tiles{grid-template-columns:minmax(0,1.9fr) repeat(11,minmax(0,1fr))}
+html.more .heads span.ex{display:block !important}html.more .tile b{font-size:clamp(12px,1.15vw,13px)}html.more .arr{font-size:.65em;margin-left:0}html.more .tile.ex{display:flex !important}
+.heads{font:500 11.5px/1.25 Poppins,sans-serif;text-align:center;color:var(--gold-hi);padding:2px 0 10px;align-items:end;border-bottom:1px solid rgb(243 212 138/.14);margin-bottom:6px;letter-spacing:.01em}
+.heads span{opacity:.9;overflow:hidden}.heads b{font-weight:inherit}.heads .short{display:none}
+.heads span:first-child{text-align:left;padding-left:8px}
+.swipe{display:none;margin:10px 4px 0;font-size:13px;color:var(--muted)}
+.row{padding:3px 0}
+.tile{height:52px;border-radius:10px;background:var(--slot);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:inset 0 0 0 1px var(--slot-line);overflow:hidden;position:relative}
+.tile b{font:600 clamp(13px,1.45vw,15px)/1 Poppins,sans-serif;white-space:nowrap;letter-spacing:-.01em}
+.arr{font-size:.7em;margin-left:1px;opacity:.9}
+.tile.nm{padding:0 10px;text-align:left;align-items:flex-start}
+.tile.nm b{font:600 13px/1.25 Poppins,sans-serif;letter-spacing:0;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile.nm small{font-size:10.5px;opacity:.75;line-height:1.2}
+.tile.hit,.tile.close,.tile.miss,.tile.unk{box-shadow:inset 0 1px 0 rgb(255 255 255/.28),inset 0 -2px 0 rgb(0 0 0/.18),0 6px 14px -8px rgb(0 0 0/.6)}
+.tile.hit{background:linear-gradient(180deg,var(--hit-2),var(--hit));color:var(--hit-ink)}
+.tile.close{background:linear-gradient(180deg,var(--close-2),var(--close));color:var(--close-ink)}
+.tile.miss{background:linear-gradient(180deg,var(--miss-2),var(--miss));color:var(--miss-ink)}
+.tile.unk{background:linear-gradient(180deg,#6b76a3,#525c88);color:#fff}
+.row.new .tile{animation:flip .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*60ms)}
+@keyframes flip{0%{transform:rotateX(90deg);filter:brightness(.4)}100%{transform:none}}
+.flag{width:22px;height:15px;border-radius:3px;flex:none;box-shadow:0 0 0 1px rgb(0 0 0/.25),0 1px 2px rgb(0 0 0/.25);overflow:hidden}
+.tile.ct{gap:4px}.tile.ct b{font-size:11.5px;letter-spacing:.02em}
+#list .flag{position:static;transform:none;width:18px;height:12px;margin-right:8px;vertical-align:-1px;display:inline-block}
+.reveal strong .flag{width:26px;height:17px;margin-right:10px;vertical-align:-2px;display:inline-block}
+@media(max-width:480px){.tile.ct .flag{width:19px;height:13px}html:not(.more) .tile.ct b{font-size:9.5px}}
+@media(prefers-reduced-motion:reduce){.row.new .tile{animation:none}}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:14px 4px 0}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:4px;display:inline-block;flex:none}
+.guide-nav{display:flex;gap:8px;overflow-x:auto;margin:34px 0 0;padding:4px 0}
+.guide-nav a{flex:none;font-size:13.5px;font-weight:500;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 16px;min-height:40px;display:inline-flex;align-items:center;background:var(--surface)}
+.guide-nav a:hover{border-color:var(--gold)}
+.guide section{padding:40px 0 8px;border-top:1px solid var(--line);margin-top:34px}
+.guide h2{margin:0 0 14px;font:700 28px/1.2 Poppins,sans-serif;letter-spacing:-.02em;text-wrap:balance}
+.guide h3{margin:24px 0 8px;font-size:16px;font-weight:600}
+.guide p,.guide li{max-width:66ch;color:light-dark(#2a3050,#c9cde4)}
+.guide b{color:var(--ink);font-weight:600}
+.guide ol,.guide ul{padding-left:22px}
+.guide li{margin:7px 0}
+.guide li::marker{color:var(--gold)}
+.cg{display:grid;gap:10px;margin:12px 0}
+.cg div{display:grid;grid-template-columns:76px minmax(0,1fr);gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px}
+.cg .tile{height:54px}
+.cg p{margin:0}
+.steps{counter-reset:s;list-style:none;padding:0 !important}
+.steps li{counter-increment:s;position:relative;padding-left:50px;min-height:34px;margin:12px 0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:32px;height:32px;border-radius:999px;background:linear-gradient(180deg,var(--gold-hi),var(--gold-lo));color:var(--gold-ink);font:700 14px/32px Poppins,sans-serif;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;font-weight:500;color:var(--muted)}
+td:first-child{font-weight:600;color:var(--ink)}
+.modes-t td:nth-child(3){text-align:right;white-space:nowrap}
+.note{font-size:13.5px;color:var(--muted)}
+footer p{margin:0 0 6px}footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer a,.guide a{color:inherit;text-decoration-color:var(--gold);text-underline-offset:3px}
+dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(540px,92vw);width:100%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+dialog::backdrop{background:rgb(4 7 24/.6);backdrop-filter:blur(4px)}
+.dlg{padding:26px 24px 22px;position:relative}
+.dlg h2{margin:0 0 12px;font:700 24px/1.2 Poppins,sans-serif;letter-spacing:-.02em;padding-right:40px}
+.x{position:absolute;top:12px;right:12px;width:40px;height:40px;border:1px solid var(--line);background:transparent;font-size:22px;cursor:pointer;border-radius:999px;line-height:1}
+.btn{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--gold-ink);border:0;border-radius:999px;padding:12px 22px;min-height:46px;font-weight:600;cursor:pointer;box-shadow:0 10px 22px -12px rgb(184 134 45/.8)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.reveal{color:var(--chalk);border-radius:16px;padding:16px 18px;margin:12px 0;background:var(--board);border:1px solid rgb(217 174 91/.28)}
+.reveal strong{display:block;font:700 24px/1.2 Poppins,sans-serif;letter-spacing:-.02em;margin:2px 0 6px;color:var(--gold-hi)}
+.reveal span{font-size:14px;opacity:.88}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center;margin:8px 0 16px}
+.stats div{background:var(--surface-2);border-radius:14px;padding:10px 4px}
+.stats b{display:block;font:700 26px/1.1 Poppins,sans-serif}
+.stats span{font-size:12px;color:var(--muted)}
+.dist div{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.dist i{display:block;font-style:normal;background:var(--surface-2);color:var(--ink);padding:2px 8px;border-radius:6px;text-align:right;min-width:26px;font-weight:600}
+.dist i.me{background:linear-gradient(180deg,var(--hit-2),var(--hit));color:#fff}
+.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:var(--surface);color:var(--ink);border:1px solid var(--gold);padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:var(--shadow)}
+.toast.on{opacity:1}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;font-weight:600}
+.chk input{width:20px;height:20px;accent-color:var(--gold)}
+textarea{width:100%;min-height:120px;font:14px/1.4 ui-monospace,monospace;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:10px}
+@media(max-width:860px){html.more .grid{min-width:820px}.heads>span:first-child,.tile.nm{position:sticky;left:0;z-index:2}.heads>span:first-child{background:var(--board);opacity:1;align-self:stretch;display:flex;align-items:flex-end;box-shadow:0 0 0 6px var(--board)}.tile.nm{box-shadow:0 0 0 4px var(--board),12px 0 14px -8px rgb(0 0 0/.8)}.tile.nm.empty{background:#161c3b}.tile b{font-size:15px}html.more .swipe{display:block}}
+@media(max-width:480px){html:not(.more) .heads,html:not(.more) .tiles{grid-template-columns:minmax(0,2.1fr) repeat(6,minmax(0,1fr));gap:4px}html:not(.more) .tile b{font-size:12px;letter-spacing:-.02em}html:not(.more) .arr{font-size:.65em;margin-left:0}html:not(.more) .heads{font-size:10.5px}html:not(.more) .heads .full{display:none}html:not(.more) .heads .short{display:inline}.tile.nm{padding:0 7px}.tile.nm b{font-size:12px}}
+@media(max-width:600px){table{font-size:14px}.stack thead{display:none}.stack tr{display:grid;padding-block:12px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:6.5em;text-align:start;white-space:normal}.stack td::before{content:attr(data-l);float:inline-start;width:6em;margin-inline-start:-6.5em;color:var(--muted);font-weight:400}.stack td:first-child{padding-inline-start:0;font-size:16px}.stack td:first-child::before{display:none}.modes-t.stack td{text-align:start}
+  .toolbar{align-items:stretch}.chips{width:100%}.chips .tb{flex:1;justify-content:center}}
+@media(max-width:480px){.mark h1{font-size:25px}.ball{width:30px;height:30px}.icons{gap:6px}.ib{width:40px;height:40px}.board{padding:12px 8px 14px;border-radius:18px}.tile{border-radius:8px}.guide h2{font-size:24px}}
+@media(max-width:380px){html:not(.more) .tile b{font-size:11px}}
+</style>
+<script>try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}let less=false;try{less=JSON.parse(localStorage.getItem("crickdle:less"))===true;}catch(e){}if(!less)document.documentElement.classList.add("more");</script>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="mark" href="#" aria-label="Crickdle home">
+      <svg class="ball" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="bg1" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e2384a"/><stop offset="1" stop-color="#7d0f1d"/></radialGradient><linearGradient id="gs" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3d48a"/><stop offset="1" stop-color="#b8862d"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#bg1)"/><path d="M9.5 4.2c3.8 6.3 3.8 17.3 0 23.6M22.5 4.2c-3.8 6.3-3.8 17.3 0 23.6" fill="none" stroke="url(#gs)" stroke-width="1.5" stroke-dasharray="1.6 1.8"/><ellipse cx="11.5" cy="10" rx="4.5" ry="3" fill="#fff" opacity=".18"/></svg>
+      <h1>Crick<span>dle</span></h1>
+    </a>
+    <div class="icons">
+      <a class="ib" href="#how" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2.3-2.6 4"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/></svg></a>
+      <button class="ib" id="bStats" type="button" aria-label="Statistics" title="Statistics"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="7" width="4" height="13" rx="1.2"/><rect x="16" y="3.5" width="4" height="16.5" rx="1.2"/></svg></button>
+      <button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    </div>
+  </header>
+  <div class="toolbar">
+    <div class="modewrap">
+      <button class="modebtn" id="bMode" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="modeMenu" title="Change game mode">
+        <span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4v-6H4zM10 20h4V9h-4zM16 20h4V4h-4z" fill="currentColor"/></svg></span>
+        <span class="lb"><small>Mode</small><span id="modeLabel">Normal</span></span><span class="car" aria-hidden="true">▼</span>
+      </button>
+      <div class="modemenu" id="modeMenu" role="menu" aria-label="Game mode" hidden></div>
+    </div>
+    <div class="chips">
+      <button class="tb" id="bPractice" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Practice</button>
+      <button class="tb" id="bMore" type="button" aria-pressed="false" title="Hide Debut, Matches, Top score, Best bowling and Titles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h6"/></svg>Less stats</button>
+    </div>
+  </div>
+  <div class="sub"><div><span id="mode"></span><p class="modenote" id="modeNote"></p></div><div class="left" id="left"></div></div>
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Type a player's name" role="combobox" aria-expanded="false" aria-controls="list" aria-autocomplete="list" aria-label="Search IPL players">
+    <ul id="list" role="listbox" aria-label="Matching players"></ul>
+  </div>
+  <section class="board" aria-label="Your guesses">
+    <div class="bscroll"><div class="grid">
+      <div class="heads" aria-hidden="true"><span>Player</span><span><b class="full">Country</b><b class="short">Ctry</b></span><span>Role</span><span>Team</span><span>Age</span><span class="ex">Debut</span><span class="ex">Matches</span><span>Runs</span><span class="ex">Top score</span><span><b class="full">Wickets</b><b class="short">Wkts</b></span><span class="ex">Best bowling</span><span class="ex">Titles</span></div>
+      <div id="rows"></div>
+    </div></div>
+  </section>
+  <p class="swipe">Swipe the board sideways to see every column. The player's name stays pinned on the left.</p>
+  <div class="legend" aria-hidden="true">
+    <span><i class="sw" style="background:var(--hit)"></i>Correct</span>
+    <span><i class="sw" style="background:var(--close)"></i>Close</span>
+    <span><i class="sw" style="background:var(--miss)"></i>Wrong</span>
+    <span>▲ ▼ the answer is higher or lower</span>
+  </div>
+
+  <nav class="guide-nav" aria-label="Guide">
+    <a href="#colours">Colour guide</a><a href="#how">How to play</a><a href="#attributes">What each attribute means</a><a href="#tips">Tips &amp; strategy</a><a href="#rules">Rules</a><a href="#about">About</a><a href="#privacy">Privacy</a>
+  </nav>
+
+  <div class="guide">
+    <section id="colours">
+      <h2>Colour guide</h2>
+      <div class="cg">
+        <div><span class="tile hit"><b>CSK</b></span><p><b>Green means correct.</b> This attribute exactly matches the hidden player.</p></div>
+        <div><span class="tile close"><b>4842<span class="arr">▲</span></b></span><p><b>Yellow means close or partly right.</b> A number is near the answer, a role overlaps (all-rounder against batter), the two players share a franchise, or the best bowling has the same number of wickets.</p></div>
+        <div><span class="tile miss"><b>AUS</b></span><p><b>Red means wrong.</b> Rule this value out and move on.</p></div>
+      </div>
+      <ul>
+        <li><b>▲</b> means the answer's number is higher than your guess (for best bowling, the answer's figure is better). <b>▼</b> means lower or worse.</li>
+        <li><b>*</b> after a top score means not out, like 175*.</li>
+        <li><b>–</b> means the player never batted (top score) or never bowled (best bowling) in the IPL.</li>
+        <li><span class="sw" style="background:#5b6690;vertical-align:-2px"></span> A <b>grey-blue ? tile</b> on Age means we don't have a birth date for one of the two players, so Age gives no clue in that row.</li>
+        <li><b>†</b> after an age means the player has died; the age shown is their age at death.</li>
+      </ul>
+      <label class="chk"><input type="checkbox" id="cbMode"> Use colour-blind tiles (orange, blue and grey)</label>
+    </section>
+
+    <section id="how">
+      <h2>How to play</h2>
+      <ol class="steps">
+        <li><b>Pick a mode.</b> Tap the Mode button above the search box to open the list of modes and choose one. Normal is the friendliest start. Each mode has its own player of the day.</li>
+        <li><b>Type at least two letters</b> of any IPL player's name, first name or surname, in the search box.</li>
+        <li><b>Choose a player</b> from the list by tapping it, or with the arrow keys and Enter.</li>
+        <li><b>Read the row.</b> Twelve tiles light up green, yellow or red under the column names at the top of the board, comparing your guess with the hidden player. On a phone, swipe the board sideways to see every column.</li>
+        <li><b>Want a simpler board?</b> Press <b>Less stats</b> above the search box to hide Debut, Matches, Top score, Best bowling and Titles, leaving seven tiles that fit a phone without swiping. Press it again to bring them back.</li>
+        <li><b>Follow the arrows</b> on number tiles to go higher or lower with your next guess.</li>
+        <li><b>Keep guessing</b> until the Player tile turns green. You have 8 guesses.</li>
+        <li><b>Share your result</b> with Copy result. It copies a spoiler-free grid of coloured squares.</li>
+        <li><b>Come back tomorrow.</b> A new player arrives at midnight your local time. Want more now? Press Practice for unlimited random games.</li>
+      </ol>
+    </section>
+
+    <section id="attributes">
+      <h2>What each attribute means</h2>
+      <p>Every number covers IPL matches only, from 2008 to the 2026 final. Columns marked “extra” are hidden when the Less stats switch above the search box is on.</p>
+      <table class="stack">
+        <thead><tr><th>Attribute</th><th>What it shows</th><th>Yellow when</th></tr></thead>
+        <tbody>
+          <tr><td>Player</td><td>The player you guessed, with their first and last IPL seasons.</td><td>Never: green only when you've found the answer</td></tr>
+          <tr><td>Country</td><td>The international team the player represents. Uncapped Indian players count as India.</td><td>Never: it's right or wrong</td></tr>
+          <tr><td>Role</td><td>Batter, Bowler, All-rounder (AR) or Keeper (WK), based on how they have played in the IPL.</td><td>The roles overlap: all-rounder against batter or bowler, keeper against batter</td></tr>
+          <tr><td>Team</td><td>The last IPL franchise they played for. Renamed teams are merged: Delhi Daredevils is DC, Kings XI Punjab is PBKS, Bangalore is RCB.</td><td>Both players have played for a common franchise at some point</td></tr>
+          <tr><td>Age</td><td>The player's age today, worked out from their date of birth. If we haven't confirmed a player's birth date, the tile shows a grey "?" and gives no clue.</td><td>Within 2 years</td></tr>
+          <tr><td>Debut (extra)</td><td>The season of their first IPL match.</td><td>Within 2 seasons</td></tr>
+          <tr><td>Matches (extra)</td><td>IPL matches played, including appearances as an impact player.</td><td>Within 15 matches</td></tr>
+          <tr><td>Runs</td><td>Total IPL runs.</td><td>Within 300 runs</td></tr>
+          <tr><td>Top score (extra)</td><td>Best single-innings score. * means not out.</td><td>Within 15 runs</td></tr>
+          <tr><td>Wickets</td><td>Total IPL wickets credited to the bowler (run-outs don't count).</td><td>Within 15 wickets</td></tr>
+          <tr><td>Best bowling (extra)</td><td>Best figures in one innings, wickets/runs, like 5/10.</td><td>Same number of wickets</td></tr>
+          <tr><td>Titles (extra)</td><td>IPL titles won while playing in the final.</td><td>Within 1 title</td></tr>
+        </tbody>
+      </table>
+      <h3>The five modes</h3>
+      <table class="modes-t stack">
+        <thead><tr><th>Mode</th><th>Who can be the answer</th><th>Players</th><th>Who you can guess</th></tr></thead>
+        <tbody id="modeRows"></tbody>
+      </table>
+      <p class="note">In Normal and Medium, the search only lists players from that mode, so every guess is a recognisable name. In Hard, This decade and 2026 season you can guess any IPL player.</p>
+    </section>
+
+    <section id="tips">
+      <h2>Tips &amp; strategy</h2>
+      <h3>Crickdle tips</h3>
+      <ul>
+        <li><b>Open with a well-travelled player.</b> Someone who played for many franchises, like Dinesh Karthik or Aaron Finch, makes the Team tile turn yellow far more often, which quickly shows which franchises to focus on.</li>
+        <li><b>Use an all-rounder early.</b> A yellow Role against an all-rounder tells you the answer is a pure batter or bowler. Then check Runs and Wickets to see which.</li>
+        <li><b>Settle Country first.</b> A red India tile means an overseas player, which cuts the list a lot. Each team fields only four overseas players, so the pool is much smaller.</li>
+        <li><b>Using Less stats and stuck?</b> Switch it off. The five extra columns give you more to work with, especially Titles and Best bowling.</li>
+        <li><b>Let Debut and Age set the era.</b> Debut and Age arrows together tell you whether you're looking for a 2008 original, a mid-2010s regular or a newer face. A young age with an early debut points to someone who started as a teenager.</li>
+        <li><b>Read Top score and Best bowling together.</b> A dash on your guess's Best bowling with a ▲ means the answer has bowled, so think bowlers and all-rounders.</li>
+        <li><b>Titles narrow things fast.</b> Many players have 0. Three or more usually points to the CSK and MI dynasties.</li>
+        <li><b>In 2026 season mode,</b> a green Team means the answer was in that franchise's 2026 side, which leaves only about 20 players.</li>
+      </ul>
+      <h3>General strategy</h3>
+      <ul>
+        <li><b>Make every guess work.</b> Pick a player who could be the answer and also tests something new, rather than repeating what you already know.</li>
+        <li><b>Halve the range.</b> If Runs says ▲ from 1,000 and ▼ from 5,000, aim near 3,000 next.</li>
+        <li><b>Trust the reds.</b> A red value is ruled out completely, so don't guess another player with it.</li>
+        <li><b>Use Practice to learn the numbers.</b> Random games build a feel for who has how many runs and wickets.</li>
+        <li><b>Play daily for your streak.</b> Each mode keeps its own streak, so you can keep five going.</li>
+      </ul>
+    </section>
+
+    <section id="rules">
+      <h2>Rules</h2>
+      <ul>
+        <li>You get 8 guesses per puzzle.</li>
+        <li>Each mode has one daily puzzle, the same for every player. It resets at midnight your local time.</li>
+        <li>In Normal and Medium you can only guess players with enough matches for that mode (50+ or 20+). In the other modes you can guess any IPL player. The answer always comes from the selected mode's pool.</li>
+        <li>You can't guess the same player twice in one game.</li>
+        <li>Practice games are random and don't count towards your stats or streaks.</li>
+        <li>Stats and streaks are saved per mode on this device only. Clearing your browser data resets them.</li>
+        <li>Stats include every IPL match from 2008 to 2026, including playoffs. Super overs are left out.</li>
+      </ul>
+    </section>
+
+    <section id="about">
+      <h2>About</h2>
+      <p>Crickdle is an unofficial, fan-made daily cricket guessing game. It covers all 809 players who have made an IPL playing XI.</p>
+      <p><strong>Crickdle is not affiliated with, endorsed by or connected to the Indian Premier League, the BCCI, any IPL franchise or any player.</strong> IPL and team names are trademarks of their owners and are used only to describe the players' records.</p>
+      <p>Match stats are computed ball by ball from <a href="https://cricsheet.org" rel="noopener">Cricsheet</a>'s IPL scorecards, used under the <a href="https://opendatacommons.org/licenses/by/1-0/" rel="noopener">Open Data Commons Attribution License</a>. We converted and summarised that data to make the game, so any errors are ours, not Cricsheet's. The match files were taken from the <a href="https://github.com/ritesh-ojha/IPL-DATASET" rel="noopener">IPL-DATASET</a> repository (MIT License), which republishes them.</p>
+      <p>Full names, countries and birth dates were added from public sources. Birth dates we couldn't confirm are left out, and those players show a "?" for age.</p>
+      <p id="contactLine" hidden>Spotted a wrong name, country or age? Email <a id="contactLink" href="#"></a> and we'll fix it.</p>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy</h2>
+      <p>Crickdle has no accounts, no ads, no analytics and no cookies. Your guesses, streaks and settings are saved only in your own browser's local storage, and nothing is sent to us. Clearing your browser data resets them.</p>
+      <p>The game shows public sporting records about professional cricketers: names, countries, teams, match stats and ages. If you are a player featured here and want something corrected or removed, please get in touch<span id="privContact" hidden> at <a id="privLink" href="#"></a></span>.</p>
+    </section>
+  </div>
+
+  <footer>
+    <p>Crickdle is an unofficial fan project, not affiliated with the IPL, the BCCI or any team.</p>
+    <p>Match data from <a href="https://cricsheet.org" rel="noopener">Cricsheet</a>, used under the <a href="https://opendatacommons.org/licenses/by/1-0/" rel="noopener">ODC Attribution License</a>, and modified. <span id="contactFoot" hidden>Corrections: <a id="contactFootLink" href="#"></a></span></p>
+  </footer>
+</div>
+
+<dialog id="dStats"><div class="dlg">
+  <button class="x" type="button" aria-label="Close" data-close>×</button>
+  <h2 id="resTitle">Statistics</h2>
+  <div id="resBody"></div>
+  <div class="stats" id="statNums"></div>
+  <div class="dist" id="dist"></div>
+  <div class="acts" id="resActs"></div>
+  <textarea id="shareBox" hidden readonly aria-label="Result to copy"></textarea>
+</div></dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+{
+// Set this to your email to show the "report a mistake" line in About and the footer.
+const CONTACT_EMAIL = "";
+const RAW = /*__DATA__*/[];
+// Simplified flag drawings (inline SVG, so they show on every device; emoji flags don't on Windows)
+const F = (body) => `<svg class="flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false">${body}</svg>`;
+const UJ = `<rect width="15" height="10" fill="#012169"/><path d="M0 0L15 10M15 0L0 10" stroke="#fff" stroke-width="2"/><path d="M0 0L15 10M15 0L0 10" stroke="#C8102E" stroke-width=".8"/><path d="M7.5 0V10M0 5H15" stroke="#fff" stroke-width="3"/><path d="M7.5 0V10M0 5H15" stroke="#C8102E" stroke-width="1.6"/>`;
+const FLAG = {
+  IND: F(`<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#FF9933"/><rect y="13.33" width="30" height="6.67" fill="#138808"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".7"/><circle cx="15" cy="10" r=".6" fill="#000080"/>`),
+  AUS: F(`<rect width="30" height="20" fill="#012169"/>${UJ}<g fill="#fff"><circle cx="7.5" cy="15.5" r="1.6"/><circle cx="23" cy="4" r=".9"/><circle cx="19.5" cy="9" r=".9"/><circle cx="26" cy="8" r=".9"/><circle cx="23" cy="16" r="1"/><circle cx="24.6" cy="11.2" r=".5"/></g>`),
+  NZ: F(`<rect width="30" height="20" fill="#012169"/>${UJ}<g fill="#C8102E" stroke="#fff" stroke-width=".4"><circle cx="23" cy="4.5" r="1"/><circle cx="20" cy="9" r="1"/><circle cx="26" cy="8.2" r="1"/><circle cx="23" cy="15.5" r="1.1"/></g>`),
+  ENG: F(`<rect width="30" height="20" fill="#fff"/><path d="M15 0V20M0 10H30" stroke="#CE1124" stroke-width="4"/>`),
+  SA: F(`<rect width="30" height="20" fill="#fff"/><path d="M0 0H30V6.67H13.3Z" fill="#E03C31"/><path d="M0 20H30V13.33H13.3Z" fill="#001489"/><path d="M0 0L13.3 10L0 20" fill="none" stroke="#fff" stroke-width="6"/><path d="M0 0L13.3 10H30M0 20L13.3 10" fill="none" stroke="#007749" stroke-width="4"/><path d="M0 3.2L9 10L0 16.8Z" fill="#000" stroke="#FFB81C" stroke-width="1.2"/>`),
+  WI: F(`<rect width="30" height="20" fill="#7B1E3A"/><circle cx="15" cy="9" r="5" fill="#F6C343"/><path d="M15 17V9.5" stroke="#2E7D32" stroke-width="1.2"/><path d="M15 9.5C13 8 11 8.6 10 10M15 9.5C17 8 19 8.6 20 10M15 9.5C14 7.5 12.5 6.8 11 7.2M15 9.5C16 7.5 17.5 6.8 19 7.2" fill="none" stroke="#2E7D32" stroke-width="1.1" stroke-linecap="round"/><path d="M8 17H22" stroke="#F6C343" stroke-width="1"/>`),
+  SL: F(`<rect width="30" height="20" fill="#FFBE29"/><rect x="1" y="1" width="3.5" height="18" fill="#00534E"/><rect x="4.5" y="1" width="3.5" height="18" fill="#EB7400"/><rect x="9" y="1" width="20" height="18" fill="#8D153A"/><path d="M14 14.5V8.5L17 6.5L20 8L22.5 7V10.5L24 14.5Z" fill="#FFBE29"/>`),
+  PAK: F(`<rect width="30" height="20" fill="#01411C"/><rect width="7.5" height="20" fill="#fff"/><circle cx="19" cy="10" r="5" fill="#fff"/><circle cx="20.4" cy="8.9" r="4.3" fill="#01411C"/><circle cx="22.2" cy="7.6" r="1.1" fill="#fff"/>`),
+  AFG: F(`<rect width="10" height="20" fill="#000"/><rect x="10" width="10" height="20" fill="#D32011"/><rect x="20" width="10" height="20" fill="#007A36"/><circle cx="15" cy="10" r="3.2" fill="none" stroke="#fff" stroke-width=".9"/>`),
+  BAN: F(`<rect width="30" height="20" fill="#006A4E"/><circle cx="13.5" cy="10" r="5.5" fill="#F42A41"/>`),
+  ZIM: F(`<rect width="30" height="20" fill="#006400"/><rect y="2.86" width="30" height="14.28" fill="#FFD200"/><rect y="5.72" width="30" height="8.56" fill="#D40000"/><rect y="8.58" width="30" height="2.84" fill="#000"/><path d="M0 0L13 10L0 20Z" fill="#fff" stroke="#000" stroke-width=".5"/><path d="M4.8 7.2L5.6 9.4H7.9L6 10.8L6.7 13L4.8 11.6L2.9 13L3.6 10.8L1.7 9.4H4Z" fill="#D40000"/>`),
+  NEP: F(`<path d="M8 1L22 10H12L22 19H8Z" fill="#DC143C" stroke="#003893" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12" cy="7" r="1.4" fill="#fff"/><circle cx="12.2" cy="15" r="1.8" fill="#fff"/>`),
+  NED: F(`<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#AE1C28"/><rect y="13.33" width="30" height="6.67" fill="#21468B"/>`),
+  KEN: F(`<rect width="30" height="20" fill="#fff"/><rect width="30" height="6" fill="#000"/><rect y="7" width="30" height="6" fill="#BB0000"/><rect y="14" width="30" height="6" fill="#006600"/><ellipse cx="15" cy="10" rx="2.6" ry="5.5" fill="#BB0000" stroke="#000" stroke-width=".6"/><path d="M15 5.5V14.5" stroke="#fff" stroke-width=".6"/>`),
+  IRE: F(`<rect width="10" height="20" fill="#169B62"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#FF883E"/>`),
+};
+const CNAME = {IND:"India", AUS:"Australia", NZ:"New Zealand", ENG:"England", SA:"South Africa", WI:"West Indies", SL:"Sri Lanka", PAK:"Pakistan", AFG:"Afghanistan", BAN:"Bangladesh", ZIM:"Zimbabwe", NEP:"Nepal", NED:"Netherlands", KEN:"Kenya", IRE:"Ireland"};
+const flag = c => FLAG[c] || "";
+const P = RAW.map(a => ({id:a[0], n:a[1], al:a[2], c:a[3], r:a[4], t:a[5], ts:a[6].split(","), d:a[7], m:a[8], ru:a[9], w:a[10], ti:a[11], ls:a[12], hs:a[13], hsno:a[14], bw:a[15], br:a[16], dob:a[17], died:a[18]}));
+const byId = new Map(P.map(p => [p.id, p]));
+const MAX = 8, EPOCH = Date.UTC(2026, 10, 23);
+const MODES = {
+  normal: {label:"Normal", who:"Players with 50 or more IPL matches", seed:20260550, pool:P.filter(p => p.m >= 50), only:true},
+  medium: {label:"Medium", who:"Players with 20 or more IPL matches", seed:20260520, pool:P.filter(p => p.m >= 20), only:true},
+  hard: {label:"Hard", who:"Every player who has played an IPL match since 2008", seed:20081804, pool:P},
+  decade: {label:"This decade", who:"Players who played in an IPL season from 2020 onwards", seed:20202029, pool:P.filter(p => p.ls >= 2020)},
+  season: {label:"2026 season", who:"Players who played in IPL 2026", seed:20260526, pool:P.filter(p => p.ls === 2026)}
+};
+const COLS = ["n","c","r","t","age","d","m","ru","hs","w","bb","ti"];
+const LABEL = {n:"Player", c:"Country", r:"Role", t:"Team", age:"Age", d:"Debut", m:"Matches", ru:"Runs", hs:"Top score", w:"Wickets", bb:"Best bowl", ti:"Titles"};
+const EXTRA = new Set(["d","m","hs","bb","ti"]);
+const moreOn = () => document.documentElement.classList.contains("more");
+const NUM = {age:2, d:2, m:15, ru:300, hs:15, w:15, ti:1};
+const ROLE = {BAT:"Batter", BOWL:"Bowler", AR:"All-rounder", WK:"Keeper"};
+const NEAR = new Set(["AR|BAT","BAT|AR","AR|BOWL","BOWL|AR","WK|BAT","BAT|WK"]);
+const $ = s => document.querySelector(s);
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, "");
+const hsText = p => p.hs < 0 ? "–" : p.hs + (p.hsno ? "*" : "");
+const bbText = p => p.bw < 0 ? "–" : `${p.bw}/${p.br}`;
+
+function rng(seed){return () => {seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296;};}
+function shuffled(list, seed){const o = [...list].sort((a, b) => a.id < b.id ? -1 : 1), r = rng(seed); for (let i = o.length - 1; i > 0; i--) {const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]];} return o;}
+function today(){const n = new Date(); return Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 864e5);}
+const DAY = today();
+// age today (or at death); year-only birth dates are treated as 1 July
+const NOW = new Date();
+function ageOf(p){
+  if (!p.dob) return null;
+  const [y, mo, d] = p.dob.split("-").map(Number);
+  const born = new Date(y, mo ? mo - 1 : 6, d || 1), end = p.died ? new Date(p.died) : NOW;
+  let a = end.getFullYear() - born.getFullYear();
+  if (end.getMonth() < born.getMonth() || (end.getMonth() === born.getMonth() && end.getDate() < born.getDate())) a--;
+  return a;
+}
+for (const p of P) p.age = ageOf(p);
+const ageText = p => p.age == null ? "?" : p.age + (p.died ? "†" : "");
+for (const k in MODES) {const M = MODES[k], o = shuffled(M.pool, M.seed); M.daily = o[((DAY % o.length) + o.length) % o.length];}
+$("#modeRows").innerHTML = Object.values(MODES).map(M => `<tr><td>${M.label}</td><td>${M.who}</td><td>${M.pool.length}</td><td>${M.only ? "Only players in this mode" : "Any IPL player"}</td></tr>`).join("");
+
+const store = {
+  get(k, f){try{const v = localStorage.getItem("crickdle:" + k); return v ? JSON.parse(v) : f;}catch(e){return f;}},
+  set(k, v){try{localStorage.setItem("crickdle:" + k, JSON.stringify(v));}catch(e){}},
+  del(k){try{localStorage.removeItem("crickdle:" + k);}catch(e){}}
+};
+// carry progress from earlier versions: v1 all-players game is now Hard; v2 "normal" (20+) is now Medium
+if (store.get("schema", 1) < 3) {
+  for (const t of ["day", "stats"]) {
+    if (store.get(t, null) && !store.get(t + ":hard", null)) store.set(t + ":hard", store.get(t, null));
+    if (store.get(t + ":normal", null) && !store.get(t + ":medium", null)) {store.set(t + ":medium", store.get(t + ":normal", null)); store.del(t + ":normal");}
+  }
+  if (store.get("mode", null) === "normal") store.set("mode", "medium");
+  store.set("schema", 3);
+}
+
+const blankStats = () => ({played:0, wins:0, streak:0, best:0, dist:[0,0,0,0,0,0,0,0], last:null});
+let mode = MODES[store.get("mode", "normal")] ? store.get("mode", "normal") : "normal";
+let practice = false, answer, guesses = [], done = false, won = false, stats;
+if (store.get("cb", false)) {document.documentElement.classList.add("cb"); $("#cbMode").checked = true;}
+
+function loadDaily(){
+  answer = MODES[mode].daily; practice = false;
+  const s = store.get("day:" + mode, null);
+  if (s && s.day === DAY) {guesses = s.g.filter(id => byId.has(id)); done = s.done; won = s.won;}
+  else {guesses = []; done = false; won = false;}
+  stats = store.get("stats:" + mode, blankStats());
+  $("#bPractice").setAttribute("aria-pressed", "false");
+}
+function save(){if (!practice) store.set("day:" + mode, {day:DAY, g:guesses, done, won});}
+
+function numCell(k, gv, av, text){
+  if (gv === av) return {v:text, s:"hit"};
+  return {v:text, s:Math.abs(gv - av) <= NUM[k] ? "close" : "miss", dir:av > gv ? "▲" : "▼"};
+}
+function compare(g, a){
+  return COLS.map(k => {
+    if (k === "n") return {v:g.n, s:g.id === a.id ? "hit" : "miss"};
+    if (k === "c") return {v:g.c, s:g.c === a.c ? "hit" : "miss"};
+    if (k === "age") return g.age == null || a.age == null ? {v:ageText(g), s:"unk"} : numCell("age", g.age, a.age, ageText(g));
+    if (k === "r") return {v:g.r, s:g.r === a.r ? "hit" : NEAR.has(g.r + "|" + a.r) ? "close" : "miss"};
+    if (k === "t") return {v:g.t, s:g.t === a.t ? "hit" : g.ts.some(t => a.ts.includes(t)) ? "close" : "miss"};
+    if (k === "hs") return g.hs === a.hs ? {v:hsText(g), s:"hit"} : numCell("hs", Math.max(g.hs, 0), Math.max(a.hs, 0), hsText(g));
+    if (k === "bb") {
+      if (g.bw === a.bw && g.br === a.br) return {v:bbText(g), s:"hit"};
+      const better = a.bw > g.bw || (a.bw === g.bw && a.br < g.br);
+      return {v:bbText(g), s:g.bw === a.bw && g.bw >= 0 ? "close" : "miss", dir:better ? "▲" : "▼"};
+    }
+    return numCell(k, g[k], a[k], g[k]);
+  });
+}
+const STATE = {hit:"correct", close:"close", miss:"wrong", unk:"unknown age"};
+function rowHTML(p, isNew){
+  const cells = compare(p, answer).map((c, i) => {
+    const k = COLS[i], hint = c.dir ? (k === "bb" ? (c.dir === "▲" ? ", answer is better" : ", answer is worse") : (c.dir === "▲" ? ", answer is higher" : ", answer is lower")) : "";
+    if (k === "c") return `<div class="tile ct ${c.s}" style="--i:${i}" role="img" aria-label="Country ${CNAME[p.c] || p.c}: ${STATE[c.s]}" title="${CNAME[p.c] || p.c}">${flag(p.c)}<b aria-hidden="true">${p.c}</b></div>`;
+    if (k === "n") return `<div class="tile nm ${c.s}" style="--i:${i}" role="img" aria-label="Player ${p.n}: ${STATE[c.s]}" title="${p.n}, ${ROLE[p.r]}, ${p.d}–${p.ls}"><small aria-hidden="true">${p.d}–${p.ls}</small><b aria-hidden="true">${p.n}</b></div>`;
+    return `<div class="tile ${c.s}${EXTRA.has(k) ? " ex" : ""}" style="--i:${i}" role="img" aria-label="${LABEL[k]} ${c.v}: ${STATE[c.s]}${hint}"><b aria-hidden="true">${c.v}${c.dir ? `<span class="arr">${c.dir}</span>` : ""}</b></div>`;
+  }).join("");
+  return `<div class="row${isNew ? " new" : ""}"><div class="tiles">${cells}</div></div>`;
+}
+const emptyRow = `<div class="row" aria-hidden="true"><div class="tiles">${COLS.map(k => `<div class="tile empty${k === "n" ? " nm" : ""}${EXTRA.has(k) ? " ex" : ""}"></div>`).join("")}</div></div>`;
+function render(newest){
+  $("#rows").innerHTML = guesses.map((id, i) => rowHTML(byId.get(id), newest && i === guesses.length - 1)).join("") + emptyRow.repeat(Math.max(0, MAX - guesses.length));
+  if (newest) setTimeout(() => document.querySelectorAll(".row.new").forEach(r => r.classList.remove("new")), 1700);
+  const pips = `<span class="pips" aria-hidden="true">${Array.from({length:MAX}, (_, i) => `<i class="${i < guesses.length ? "used" : ""}"></i>`).join("")}</span>`;
+  $("#left").innerHTML = done ? `<b style="color:var(--ink)">${won ? `Got it in ${guesses.length}` : "Out of guesses"}</b>` : `${pips}<span><b style="color:var(--ink)">${MAX - guesses.length}</b> left</span><span class="vh">${MAX - guesses.length} guesses left</span>`;
+  $("#mode").textContent = practice ? `Practice: a random ${MODES[mode].label} player` : `Puzzle #${DAY + 1}`;
+  $("#modeNote").textContent = `${MODES[mode].label} mode: ${MODES[mode].who.charAt(0).toLowerCase() + MODES[mode].who.slice(1)} (${MODES[mode].pool.length}).${MODES[mode].only ? " Only these players can be guessed." : " Any IPL player can be guessed."}`;
+  $("#modeLabel").textContent = MODES[mode].label;
+  $("#bMode").setAttribute("aria-label", `Game mode: ${MODES[mode].label}. Change mode`);
+  document.querySelectorAll("#modeMenu button").forEach(b => b.setAttribute("aria-checked", b.dataset.mode === mode ? "true" : "false"));
+  $("#q").disabled = done;
+  $("#q").placeholder = done ? "Finished. Try another mode or play Practice" : "Type a player's name";
+}
+
+let hits = [], sel = -1;
+function search(){
+  const q = norm($("#q").value.trim());
+  hits = [];
+  if (q.length >= 2) {
+    const used = new Set(guesses), M = MODES[mode];
+    for (const p of (M.only ? M.pool : P)) {
+      if (used.has(p.id)) continue;
+      const name = norm(p.n), al = norm(p.al);
+      let score = -1;
+      if (name.startsWith(q) || name.split(" ").some(w => w.startsWith(q))) score = 2;
+      else if (name.includes(q) || al.includes(q)) score = 1;
+      if (score >= 0) hits.push([score, p]);
+    }
+    hits.sort((a, b) => b[0] - a[0] || b[1].m - a[1].m);
+    hits = hits.slice(0, 8).map(h => h[1]);
+  }
+  sel = hits.length ? 0 : -1;
+  drawList();
+}
+function drawList(){
+  if (sel >= hits.length) sel = hits.length ? 0 : -1;
+  $("#list").innerHTML = hits.map((p, i) => `<li role="option" id="o${i}" data-i="${i}" aria-selected="${i === sel}"><span>${flag(p.c)}${p.n}</span><small>${p.t}, ${p.d}–${p.ls}</small></li>`).join("");
+  $("#q").setAttribute("aria-expanded", hits.length ? "true" : "false");
+  if (sel >= 0) {$("#q").setAttribute("aria-activedescendant", "o" + sel); $("#o" + sel).scrollIntoView({block:"nearest"});}
+  else $("#q").removeAttribute("aria-activedescendant");
+  if (!hits.length && norm($("#q").value).length >= 2) $("#list").innerHTML = `<li aria-disabled="true"><span>${MODES[mode].only ? `No ${MODES[mode].label} mode player matches that. This mode only has players with ${mode === "normal" ? 50 : 20}+ IPL matches.` : "No IPL player matches that. Try a surname."}</span></li>`;
+}
+function pick(p){
+  if (!p || done) return;
+  guesses.push(p.id);
+  $("#q").value = ""; hits = []; drawList();
+  if (p.id === answer.id) {done = true; won = true;}
+  else if (guesses.length >= MAX) done = true;
+  if (done && !practice) record();
+  save(); render(true);
+  if (done) setTimeout(() => showStats(true), matchMedia("(prefers-reduced-motion: reduce)").matches ? 200 : 1100);
+  else $("#q").focus();
+}
+$("#q").addEventListener("input", search);
+$("#q").addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" && hits.length) {sel = (sel + 1) % hits.length; drawList(); e.preventDefault();}
+  else if (e.key === "ArrowUp" && hits.length) {sel = (sel - 1 + hits.length) % hits.length; drawList(); e.preventDefault();}
+  else if (e.key === "Enter") {pick(hits[sel]); e.preventDefault();}
+  else if (e.key === "Escape") {hits = []; drawList();}
+});
+$("#list").addEventListener("mousedown", e => {const li = e.target.closest("li[data-i]"); if (li) {e.preventDefault(); pick(hits[+li.dataset.i]);}});
+document.addEventListener("click", e => {if (!e.target.closest(".search")) {hits = []; drawList();}});
+
+function record(){
+  stats.played++;
+  if (won) {stats.wins++; stats.dist[guesses.length - 1]++; stats.streak = stats.last === DAY - 1 ? stats.streak + 1 : 1; stats.best = Math.max(stats.best, stats.streak); stats.last = DAY;}
+  else stats.streak = 0;
+  store.set("stats:" + mode, stats);
+}
+function shareText(){
+  const E = {hit:"🟩", close:"🟨", miss:"🟥", unk:"⬜"};
+  const grid = guesses.map(id => compare(byId.get(id), answer).filter((c, i) => moreOn() || !EXTRA.has(COLS[i])).map(c => E[c.s]).join("")).join("\n");
+  return `Crickdle ${practice ? "practice" : "#" + (DAY + 1)} (${MODES[mode].label}) ${won ? guesses.length : "X"}/${MAX}\n${grid}`;
+}
+function countdown(){const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const s = Math.floor((m - n) / 1000); return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m`;}
+function showStats(withResult){
+  const r = withResult && done, a = answer;
+  $("#resTitle").textContent = r ? (won ? "Well played" : "Bowled out") : `${MODES[mode].label} mode statistics`;
+  $("#resBody").innerHTML = r ? `<div class="reveal"><span>${won ? "The player was" : "Today's player was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${CNAME[a.c] || a.c}, ${ROLE[a.r]}${a.age != null ? `, ${a.died ? "died aged " + a.age : "age " + a.age}` : ""}. ${a.m} matches for ${a.ts.join(", ")}. ${a.ru} runs, top score ${hsText(a)}. ${a.w} wickets${a.bw >= 0 ? `, best ${bbText(a)}` : ""}.</span></div>${practice ? "" : `<p>Next player in ${countdown()}. Try another mode while you wait.</p>`}` : "";
+  const pct = stats.played ? Math.round(stats.wins / stats.played * 100) : 0;
+  $("#statNums").innerHTML = [[stats.played, "Played"], [pct, "Win %"], [stats.streak, "Streak"], [stats.best, "Best streak"]].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("");
+  const top = Math.max(1, ...stats.dist);
+  $("#dist").innerHTML = `<p style="margin:0 0 4px;font-weight:700">Guesses to win (${MODES[mode].label} daily games)</p>` + stats.dist.map((v, i) => `<div><span style="width:1em">${i + 1}</span><i class="${r && won && !practice && guesses.length === i + 1 ? "me" : ""}" style="width:${Math.max(8, v / top * 100)}%">${v}</i></div>`).join("");
+  $("#resActs").innerHTML = (r ? `<button class="btn" id="bShare" type="button">Copy result</button>` : "") + `<button class="btn ghost" id="bNew" type="button">${practice ? "New practice player" : "Play practice"}</button>`;
+  $("#shareBox").hidden = true;
+  const bs = $("#bShare");
+  if (bs) bs.onclick = async () => {
+    const t = shareText();
+    try {await navigator.clipboard.writeText(t); toast("Result copied");}
+    catch (e) {const b = $("#shareBox"); b.value = t; b.hidden = false; b.select(); toast("Select and copy the text below");}
+  };
+  $("#bNew").onclick = () => {$("#dStats").close(); startPractice();};
+  if (!$("#dStats").open) $("#dStats").showModal();
+}
+function startPractice(){
+  practice = true; $("#bPractice").setAttribute("aria-pressed", "true");
+  const pool = MODES[mode].pool;
+  let a; do {a = pool[Math.floor(Math.random() * pool.length)];} while (a.id === answer.id);
+  answer = a; guesses = []; done = false; won = false; render(false); $("#q").focus();
+}
+function setMode(m){
+  if (m === mode && !practice) return;
+  mode = m; store.set("mode", m); loadDaily(); render(false);
+}
+let tt;
+function toast(m){const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2200);}
+
+function applyTheme(t){
+  document.documentElement.dataset.theme = t;
+  $("#bTheme").setAttribute("aria-pressed", t === "dark" ? "true" : "false");
+}
+const sysDark = matchMedia("(prefers-color-scheme: dark)");
+const curTheme = () => document.documentElement.dataset.theme || (sysDark.matches ? "dark" : "light");
+applyTheme(curTheme());
+$("#bTheme").onclick = () => {const t = curTheme() === "dark" ? "light" : "dark"; applyTheme(t); store.set("theme", t);};
+function applyMore(on){
+  document.documentElement.classList.toggle("more", on);
+  $("#bMore").setAttribute("aria-pressed", on ? "false" : "true");
+}
+applyMore(moreOn());
+$("#bMore").onclick = () => {const less = moreOn(); applyMore(!less); store.set("less", less); toast(less ? "Less stats on: 7 columns" : "All 12 columns shown");};
+$("#bStats").onclick = () => showStats(done);
+$("#bPractice").onclick = () => practice ? (loadDaily(), render(false)) : startPractice();
+$("#modeMenu").innerHTML = Object.entries(MODES).map(([k, M]) => `<button type="button" role="menuitemradio" data-mode="${k}" aria-checked="false"><span class="dot" aria-hidden="true"></span><b>${M.label}</b><small>${M.who} (${M.pool.length})</small></button>`).join("");
+const menu = $("#modeMenu"), mb = $("#bMode");
+function openMenu(open){
+  menu.hidden = !open; mb.setAttribute("aria-expanded", open ? "true" : "false");
+  if (open) (menu.querySelector('[aria-checked="true"]') || menu.querySelector("button")).focus();
+}
+mb.onclick = e => {e.stopPropagation(); openMenu(menu.hidden);};
+menu.querySelectorAll("button").forEach(b => b.onclick = () => {openMenu(false); setMode(b.dataset.mode); mb.focus(); toast(`${MODES[b.dataset.mode].label} mode`);});
+menu.addEventListener("keydown", e => {
+  const items = [...menu.querySelectorAll("button")], i = items.indexOf(document.activeElement);
+  if (e.key === "ArrowDown") {items[(i + 1) % items.length].focus(); e.preventDefault();}
+  else if (e.key === "ArrowUp") {items[(i - 1 + items.length) % items.length].focus(); e.preventDefault();}
+  else if (e.key === "Escape") {openMenu(false); mb.focus();}
+});
+document.addEventListener("click", e => {if (!menu.hidden && !e.target.closest(".modewrap")) openMenu(false);});
+$("#cbMode").onchange = e => {document.documentElement.classList.toggle("cb", e.target.checked); store.set("cb", e.target.checked);};
+document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => b.closest("dialog").close());
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => {if (e.target === d) d.close();}));
+
+loadDaily(); render(false);
+if (done) showStats(true);
+if (CONTACT_EMAIL) {
+  for (const [line, link] of [["#contactLine", "#contactLink"], ["#contactFoot", "#contactFootLink"], ["#privContact", "#privLink"]]) {
+    $(link).href = "mailto:" + CONTACT_EMAIL + "?subject=Crickdle%20correction"; $(link).textContent = CONTACT_EMAIL; $(line).hidden = false;
+  }
+}
+}
+</script>
+</body>
+</html>
