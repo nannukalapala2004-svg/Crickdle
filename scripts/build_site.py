@@ -77,6 +77,14 @@ cp = open("src/path.html", encoding="utf-8").read()
 cp = cp.replace("/*__PATHDATA__*/{players:[], paths:{}}", json.dumps({"players": cp_players, "paths": paths}, ensure_ascii=False, separators=(",", ":")))
 cp = cp.replace("/*__FLAGS__*/{}", open("data/flags.json", encoding="utf-8").read())
 cp = cp.replace("/*__ICONIC__*/[]", json.dumps([by_name[n] for n in iconic]))
+# The Over (daily trivia): players, paths and season facts (data/trivia.json from build_trivia.py)
+ov_players = [[r[0], r[1], r[3], r[8], r[9], r[10], r[7], r[12], r[13], r[14]] for r in rows]
+ov = open("src/over.html", encoding="utf-8").read()
+ov = ov.replace("/*__OVERDATA__*/{players:[], paths:{}, seasons:{}}", json.dumps({"players": ov_players, "paths": paths, "seasons": json.load(open("data/trivia.json", encoding="utf-8"))}, ensure_ascii=False, separators=(",", ":")))
+ov = ov.replace("/*__FLAGS__*/{}", open("data/flags.json", encoding="utf-8").read())
+os.makedirs("over", exist_ok=True)
+with open("over/index.html", "w", encoding="utf-8") as f:
+    f.write(ov)
 os.makedirs("path", exist_ok=True)
 with open("path/index.html", "w", encoding="utf-8") as f:
     f.write(cp)

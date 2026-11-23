@@ -101,3 +101,10 @@ A second game with two modes, each with its own daily puzzle (resets at local mi
 Only Spot the Star players (`data/iconic.txt`) are used, as answers and as guesses. Answers are the legends who played for 2+ franchises (66; Build the path uses those with 2–7 stints). Daily answers are seeded random picks, never the same two days running.
 
 Data: `scripts/build_paths.py <cricsheet json dir> data/paths.json` builds each player's season-by-season franchise path (the franchise he played for each season, grouped into stints; seasons in a squad without playing aren't included). `data/flags.json` holds the flag drawings shared with Player of the Day. `scripts/build_site.py` builds `path/index.html` from `src/path.html`. Progress is stored under `crickdle:cp:` in localStorage. Google sign-in sync doesn't cover Career Path yet.
+
+## The Over (`over/`)
+Daily IPL trivia: six multiple-choice questions, one per ball of the over, the same for everyone each day (resets at local midnight), plus unlimited practice overs. After each answer the right one and a fact are shown; at the end the score (X/6), a review of all six and a share grid appear on the page.
+
+Every question is generated from the data, never written by hand, so answers match the records the site uses. Question types: IPL champion of a season, runner-up, Player of the Match in a final, final venue, the season's top run-scorer and wicket-taker, most career runs / wickets / matches among four players, whose highest score is N, who debuted in a year, and which team a player played for in a season. A season is never asked about twice in one over.
+
+Data: `scripts/build_trivia.py <cricsheet json dir> data/trivia.json` computes each season's champion, runner-up, final venue, final XIs, Player of the Match and the top six run-scorers and wicket-takers. Career questions use players with 50+ IPL matches. `scripts/build_site.py` builds `over/index.html` from `src/over.html`. Progress is stored under `crickdle:over:`. Season leaders were checked against the official Orange and Purple Cap winners for 2008–2025. Totals come from Cricsheet's records and can occasionally differ by one from other sites.
