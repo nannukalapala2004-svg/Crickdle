@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Path – Wicketle</title>
+<meta name="description" content="Career Path: guess the IPL player from the teams he played for, or rebuild a player's path team by team. A new puzzle every day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>try{const t=JSON.parse(localStorage.getItem("crickdle:theme"));if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;}catch(e){}</script>
+<style>
+/* Career Path: same night-match look as Player of the Day. The path itself is the hero: a vertical
+   timeline of franchise stints on the navy board, read top to bottom like a career. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#f6f7fb,#090d20);--ink:light-dark(#0b1030,#eef0fa);--muted:light-dark(#5b6283,#9aa2c6);
+  --surface:light-dark(#ffffff,#111735);--surface-2:light-dark(#eef0f7,#171e42);--line:light-dark(#dfe2ee,rgb(255 255 255/.08));
+  --board:#0f1534;--chalk:#eef0fa;--chalk-2:#a9b0d2;--slot:rgb(255 255 255/.05);--slot-line:rgb(255 255 255/.08);
+  --gold:#d9ae5b;--gold-hi:#f3d48a;--gold-lo:#b8862d;--gold-ink:#2a1d05;
+  --hit:#1fa463;--close:#f2c14e;--close-ink:#2b1f00;--miss:#c9343c;--none:#3a4166;
+  --shadow:light-dark(0 24px 60px -30px rgb(11 16 48/.45),0 30px 70px -30px rgb(0 0 0/.8))}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+:root.cb{--hit:#e0682a;--close:#6aaef0;--close-ink:#08223d;--miss:#4e5566}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;color:var(--ink);background:var(--bg);font:15px/1.6 Poppins,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:820px;margin:0 auto;padding:22px max(4vw,14px) 48px}
+[hidden]{display:none!important}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none}
+.ball{width:34px;height:34px;filter:drop-shadow(0 6px 14px rgb(200 30 50/.35))}
+.mark b{font-size:27px;font-weight:700;letter-spacing:-.02em}
+.mark b span{background:linear-gradient(180deg,var(--gold-hi),var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.icons{display:flex;gap:8px}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink);text-decoration:none}
+.ib svg{width:20px;height:20px}.ib .sun{display:none}
+:root[data-theme=dark] .ib .moon{display:none}:root[data-theme=dark] .ib .sun{display:block}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ib .moon{display:none}:root:not([data-theme=light]) .ib .sun{display:block}}
+
+h1.title{margin:0;font-size:clamp(26px,4.6vw,34px);font-weight:700;letter-spacing:-.02em}
+.tabs{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface);border:1px solid var(--line);margin:12px 0 0}
+.tabs button{border:0;background:none;padding:8px 16px;border-radius:999px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted)}
+.tabs button[aria-selected=true]{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--gold-ink)}
+.sub{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 12px}
+.sub .lab{font-weight:700}.sub .lab small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.tb{font-weight:500;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 16px;min-height:42px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.tb svg{width:16px;height:16px}
+.tb[aria-pressed=true]{border-color:var(--gold);color:var(--gold-lo)}
+:root[data-theme=dark] .tb[aria-pressed=true]{color:var(--gold-hi)}
+
+.board{color:var(--chalk);border-radius:22px;padding:20px 18px;background:var(--board);border:1px solid rgb(217 174 91/.28);box-shadow:var(--shadow)}
+.board h2{margin:0 0 4px;font-size:13px;font-weight:600;color:var(--chalk-2)}
+/* career timeline */
+.path{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px;counter-reset:st}
+.path li{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:12px;position:relative}
+.path .yr{font-variant-numeric:tabular-nums;font-size:13px;color:var(--chalk-2);text-align:right;line-height:1.25}
+.chip{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--slot);border:1px solid var(--slot-line);font-weight:600}
+.chip b{font-size:15px;letter-spacing:.02em;min-width:44px}.chip span{font-weight:400;color:var(--chalk-2);font-size:13.5px}
+.path li+li::before{content:"";position:absolute;left:104px;top:-9px;width:2px;height:10px;background:rgb(217 174 91/.45)}
+
+/* clues */
+.clues{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:18px}
+.clue{padding:9px 12px;border-radius:12px;background:var(--slot);border:1px dashed var(--slot-line);font-size:13px;color:var(--chalk-2)}
+.clue b{display:block;color:var(--chalk);font-size:14.5px;font-weight:600;margin-top:1px}
+.clue.on{border-style:solid;border-color:rgb(217 174 91/.4)}
+.flag{width:20px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;box-shadow:0 0 0 1px rgb(0 0 0/.25)}
+
+/* search + guesses */
+.search{position:relative;margin:16px 0 0}
+.search input{width:100%;padding:14px 16px 14px 46px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font-size:16px;color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgb(217 174 91/.18)}
+.search>svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--muted);pointer-events:none}
+#list{position:absolute;z-index:5;left:0;right:0;top:calc(100% + 6px);list-style:none;margin:0;padding:6px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);max-height:300px;overflow:auto}
+#list:empty{display:none}
+#list li{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer}
+#list li[aria-selected=true],#list li:hover{background:var(--surface-2)}
+#list small{color:var(--muted)}
+.guesses{display:grid;gap:8px;margin-top:14px}
+.g{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.g .nm{font-weight:600;min-width:150px}
+.g.win{border-color:var(--hit);box-shadow:0 0 0 1px var(--hit) inset}
+.mini{display:flex;gap:4px;flex-wrap:wrap}
+.mini i{font-style:normal;font-size:11.5px;font-weight:700;padding:3px 7px;border-radius:7px;background:var(--miss);color:#fff;letter-spacing:.02em}
+.mini i.hit{background:var(--hit)}.mini i.close{background:var(--close);color:var(--close-ink)}
+.left{color:var(--muted);font-size:14px}.left b{color:var(--ink)}
+
+/* build mode */
+.who{display:flex;align-items:center;gap:14px}
+.who .av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:20px;color:var(--gold-ink);background:linear-gradient(180deg,var(--gold-hi),var(--gold));flex:none}
+.who h3{margin:0;font-size:22px;line-height:1.2}.who p{margin:2px 0 0;color:var(--chalk-2);font-size:13.5px}
+.rows{display:grid;gap:10px;margin-top:18px}
+.brow{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.slot{min-height:58px;border-radius:12px;background:var(--slot);border:1px solid var(--slot-line);display:grid;place-items:center;align-content:center;gap:1px;padding:4px 2px;text-align:center;color:var(--chalk)}
+.slot b{font-size:14px;letter-spacing:.02em}.slot small{font-size:10.5px;color:var(--chalk-2);font-variant-numeric:tabular-nums;line-height:1.15}
+.slot.hit{background:var(--hit);border-color:var(--hit)}.slot.close{background:var(--close);border-color:var(--close);color:var(--close-ink)}
+.slot.miss{background:var(--miss);border-color:var(--miss)}
+.slot.hit small,.slot.miss small{color:rgb(255 255 255/.85)}.slot.close small{color:rgb(43 31 0/.75)}
+button.slot{cursor:pointer;font:inherit}
+button.slot.sel{outline:2px solid var(--gold);outline-offset:2px;background:rgb(217 174 91/.12)}
+.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;margin-top:14px}
+.picker button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 6px;cursor:pointer;text-align:center;line-height:1.2}
+.picker button b{display:block;font-size:14px}.picker button small{font-size:11px;color:var(--muted)}
+.picker button:disabled{opacity:.32;cursor:not-allowed}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--gold-ink);border:0;border-radius:999px;padding:12px 22px;min-height:46px;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.hint{color:var(--muted);font-size:13px;margin:8px 0 0}
+
+/* dialog + toast */
+dialog{border:1px solid var(--line);border-radius:22px;padding:0;max-width:min(520px,92vw);width:100%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+dialog::backdrop{background:rgb(4 7 24/.6);backdrop-filter:blur(4px)}
+.dlg{padding:26px 24px 22px;position:relative}.dlg h2{margin:0 0 10px;font-size:24px}
+.x{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:20px}
+.reveal{padding:14px 16px;border-radius:14px;background:var(--board);color:var(--chalk);margin-bottom:14px}
+.reveal span{display:block;font-size:13px;color:var(--chalk-2)}.reveal strong{display:block;font-size:20px;margin:2px 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;margin:8px 0 14px}
+.stats div{background:var(--surface-2);border-radius:14px;padding:10px 4px}.stats b{display:block;font-size:24px;line-height:1.1}.stats span{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-30px);opacity:0;pointer-events:none;transition:.25s;background:var(--surface);border:1px solid var(--gold);padding:10px 18px;border-radius:999px;font-weight:600;box-shadow:var(--shadow);z-index:50}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+textarea{width:100%;margin-top:10px;min-height:110px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:10px}
+
+.guide{margin-top:40px}
+.guide section{padding-top:28px;margin-top:28px;border-top:1px solid var(--line)}
+.guide h2{margin:0 0 12px;font-size:22px}
+.guide p,.guide li{max-width:66ch;color:light-dark(#2a3050,#c9cde4)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:7px}.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer p{margin:0 0 6px}footer a{text-decoration-color:var(--gold);text-underline-offset:3px}
+
+@media(max-width:560px){
+  .path li{grid-template-columns:70px 1fr;gap:10px}.path li+li::before{left:80px}
+  .chip{padding:9px 12px}.chip span{display:none}
+  .board{padding:16px 12px}
+  .g .nm{min-width:0;width:100%}
+  .slot{min-height:52px}.slot b{font-size:12.5px}.slot small{font-size:9.5px}
+  .brow{gap:4px}
+  .tabs{display:flex;width:100%}.tabs button{flex:1;padding:8px 6px}
+}
+@media(max-width:380px){.mark b{font-size:23px}.icons{gap:5px}.ib{width:38px;height:38px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="mark" href="../" aria-label="Wicketle home: all games">
+      <svg class="ball" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="bg1" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e2384a"/><stop offset="1" stop-color="#7d0f1d"/></radialGradient><linearGradient id="gs" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3d48a"/><stop offset="1" stop-color="#b8862d"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#bg1)"/><path d="M9.5 4.2c3.8 6.3 3.8 17.3 0 23.6M22.5 4.2c-3.8 6.3-3.8 17.3 0 23.6" fill="none" stroke="url(#gs)" stroke-width="1.5" stroke-dasharray="1.6 1.8"/><ellipse cx="11.5" cy="10" rx="4.5" ry="3" fill="#fff" opacity=".18"/></svg>
+      <b>Wicket<span>le</span></b>
+    </a>
+    <div class="icons">
+      <a class="ib" href="../" aria-label="Home" title="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9v10.5h4.5v-6h4v6h4.5V9"/></svg></a>
+      <a class="ib" href="#how" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.4 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2.3-2.6 4"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/></svg></a>
+      <button class="ib" id="bStats" type="button" aria-label="Statistics" title="Statistics"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="7" width="4" height="13" rx="1.2"/><rect x="16" y="3.5" width="4" height="16.5" rx="1.2"/></svg></button>
+      <button class="ib" id="bTheme" type="button" aria-pressed="false" aria-label="Dark mode" title="Dark mode on/off"><svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+    </div>
+  </header>
+
+  <h1 class="title">Career Path</h1>
+  <div class="tabs" role="tablist" aria-label="Game type">
+    <button type="button" role="tab" id="tGuess" aria-selected="true" aria-controls="pGuess">Who's the player?</button>
+    <button type="button" role="tab" id="tBuild" aria-selected="false" aria-controls="pBuild">Build the path</button>
+  </div>
+  <div class="sub">
+    <div class="lab" id="lab"></div>
+    <button class="tb" id="bPractice" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span>Practice</span></button>
+  </div>
+
+  <!-- Who's the player? -->
+  <div id="pGuess" role="tabpanel" aria-labelledby="tGuess">
+    <section class="board" aria-label="Career path">
+      <h2>IPL career path</h2>
+      <ol class="path" id="gPath"></ol>
+      <div class="clues" id="gClues" aria-live="polite"></div>
+    </section>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Who is it? Type a player's name" role="combobox" aria-expanded="false" aria-controls="list" aria-autocomplete="list" aria-label="Guess the player">
+      <ul id="list" role="listbox" aria-label="Matching players"></ul>
+    </div>
+    <p class="left" id="gLeft"></p>
+    <div class="guesses" id="gRows" aria-live="polite"></div>
+  </div>
+
+  <!-- Build the path -->
+  <div id="pBuild" role="tabpanel" aria-labelledby="tBuild" hidden>
+    <section class="board" aria-label="Build the path">
+      <div class="who" id="bWho"></div>
+      <div class="rows" id="bRows"></div>
+    </section>
+    <p class="hint" id="bHint">Tap a slot, then pick the team he played for in those seasons.</p>
+    <div class="picker" id="bPick" aria-label="Teams"></div>
+    <div class="acts"><button class="btn" id="bCheck" type="button" disabled>Check path</button><button class="btn ghost" id="bClear" type="button">Clear row</button></div>
+  </div>
+
+  <div class="guide">
+    <p class="legend" aria-hidden="true"><span><i style="background:var(--hit)"></i>Right team, right place</span><span><i style="background:var(--close)"></i>In his path, different place</span><span><i style="background:var(--miss)"></i>Not in his path</span></p>
+    <section id="how">
+      <h2>How to play Career Path</h2>
+      <p><b>Who's the player?</b> You see the career path of an IPL legend (the same players as Spot the Star): every franchise he played for, in order, with the seasons. You can only guess Spot the Star players. Guess who it is in 6 tries. Each guess shows that player's own path, coloured against the answer, and each wrong guess unlocks a new clue: country, role, matches, runs and wickets, then initials.</p>
+      <p><b>Build the path.</b> You see the player. Fill in the franchise he played for in each stint, in order. The seasons are shown on each slot, and teams that didn't play in those seasons are greyed out. Press Check path: green is right, yellow means that team is in his path but somewhere else, red means he never played for them. You have 6 tries.</p>
+      <p>Each game has one daily puzzle, the same for everyone, which resets at midnight your local time. Practice gives unlimited random players and doesn't count towards your stats.</p>
+      <p>A path lists the seasons a player actually played IPL matches. Seasons spent in a squad without playing aren't included. Delhi Daredevils, Kings XI Punjab and Royal Challengers Bangalore appear under their current names (DC, PBKS, RCB); Deccan Chargers (DCH) are separate from Sunrisers Hyderabad.</p>
+    </section>
+  </div>
+
+  <footer>
+    <p>Wicketle is an unofficial fan project, not affiliated with the IPL, the BCCI or any team.</p>
+    <p>Match data from <a href="https://cricsheet.org" rel="noopener">Cricsheet</a>, used under the <a href="https://opendatacommons.org/licenses/by/1-0/" rel="noopener">ODC Attribution License</a>, and modified.</p>
+    <p><a href="../#about">About</a> · <a href="../#privacy">Privacy</a></p>
+  </footer>
+</div>
+
+<dialog id="dRes"><div class="dlg">
+  <button class="x" type="button" aria-label="Close" data-close>×</button>
+  <h2 id="rTitle">Statistics</h2>
+  <div id="rBody"></div>
+  <div class="stats" id="rStats"></div>
+  <div class="acts" id="rActs"></div>
+  <textarea id="shareBox" hidden readonly aria-label="Result to copy"></textarea>
+</div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+{
+const RAW = /*__PATHDATA__*/{players:[], paths:{}};
+const $ = s => document.querySelector(s);
+const TEAM = {CSK:"Chennai Super Kings", DC:"Delhi Capitals", DCH:"Deccan Chargers", GL:"Gujarat Lions", GT:"Gujarat Titans", KKR:"Kolkata Knight Riders", KTK:"Kochi Tuskers Kerala", LSG:"Lucknow Super Giants", MI:"Mumbai Indians", PBKS:"Punjab Kings", PWI:"Pune Warriors", RCB:"Royal Challengers Bengaluru", RPS:"Rising Pune Supergiant", RR:"Rajasthan Royals", SRH:"Sunrisers Hyderabad"};
+const ROLE = {BAT:"Batter", BOWL:"Bowler", AR:"All-rounder", WK:"Wicketkeeper"};
+const CNAME = {IND:"India", AUS:"Australia", NZ:"New Zealand", ENG:"England", SA:"South Africa", WI:"West Indies", SL:"Sri Lanka", PAK:"Pakistan", AFG:"Afghanistan", BAN:"Bangladesh", ZIM:"Zimbabwe", NEP:"Nepal", NED:"Netherlands", KEN:"Kenya", IRE:"Ireland"};
+const FLAG = /*__FLAGS__*/{};
+const ICONIC = new Set(/*__ICONIC__*/[]);
+// Career Path uses only the Spot the Star legends: they are the answers and the only players you can guess.
+const P = RAW.players.filter(r => ICONIC.has(r[0])).map(r => ({id:r[0], n:r[1], al:r[2], c:r[3], r:r[4], m:r[5], ru:r[6], w:r[7], d:r[8], ls:r[9], path:RAW.paths[r[0]] || []}));
+const byId = new Map(P.map(p => [p.id, p]));
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, "");
+const flag = c => FLAG[c] ? FLAG[c].replace("<svg", '<svg class="flag"') : "";
+// seasons each franchise actually played (CSK and RR sat out 2016-17), from every player's path
+const ACTIVE = {};
+for (const p of Object.values(RAW.paths).map(path => ({path}))) for (const [t, ys] of p.path) for (const y of ys) (ACTIVE[t] ||= new Set()).add(y);
+// "2008, 2009, 2010, 2014" -> "2008–10, 2014"
+function yrs(list){
+  const out = []; let a = list[0], b = list[0];
+  for (const y of list.slice(1).concat([null])) {
+    if (y === b + 1) {b = y; continue;}
+    out.push(a === b ? String(a) : `${a}–${String(b).slice(2)}`); a = b = y;
+  }
+  return out.join(", ");
+}
+const store = {
+  get(k, f){try{const v = localStorage.getItem("crickdle:cp:" + k); return v ? JSON.parse(v) : f;}catch(e){return f;}},
+  set(k, v){try{localStorage.setItem("crickdle:cp:" + k, JSON.stringify(v));}catch(e){}}
+};
+let tt; function toast(m){const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2200);}
+
+// ---------- daily answers ----------
+const EPOCH = Date.UTC(2026, 10, 23);
+const n0 = new Date(); const DAY = Math.floor((Date.UTC(n0.getFullYear(), n0.getMonth(), n0.getDate()) - EPOCH) / 864e5);
+function rng(seed){return () => {seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296;};}
+const byIdSort = (a, b) => a.id < b.id ? -1 : 1;
+const GAME = {
+  // answers: legends who played for 2+ franchises (a one-team career like Kohli's gives itself away)
+  guess: {key:"guess", label:"Who's the player?", max:6, seed:72100613, pool:P.filter(p => p.path.length >= 2).sort(byIdSort)},
+  build: {key:"build", label:"Build the path", max:6, seed:51730977, pool:P.filter(p => p.path.length >= 2 && p.path.length <= 7).sort(byIdSort)}
+};
+function dailyFor(g, d){
+  const G = GAME[g], c = (G.cache ||= []);
+  for (let i = c.length; i <= d; i++) {
+    let k = 0, p;
+    do {p = G.pool[Math.floor(rng(G.seed + i * 7919 + k * 104729)() * G.pool.length)]; k++;} while (i > 0 && p === c[i - 1]);
+    c[i] = p;
+  }
+  return c[Math.max(0, d)];
+}
+
+// ---------- state ----------
+let game = store.get("tab", "guess") === "build" ? "build" : "guess";
+const S = {guess:{}, build:{}};
+function load(g){
+  const s = S[g]; s.practice = false; s.answer = dailyFor(g, DAY);
+  const saved = store.get("day:" + g, null);
+  if (saved && saved.day === DAY) Object.assign(s, {rows:saved.rows, done:saved.done, won:saved.won});
+  else Object.assign(s, {rows:[], done:false, won:false});
+  if (g === "build") resetDraft();
+}
+function save(g){const s = S[g]; if (!s.practice) store.set("day:" + g, {day:DAY, rows:s.rows, done:s.done, won:s.won});}
+function practice(g){
+  const s = S[g], pool = GAME[g].pool; let a;
+  do {a = pool[Math.floor(Math.random() * pool.length)];} while (a === s.answer);
+  Object.assign(s, {practice:true, answer:a, rows:[], done:false, won:false});
+  if (g === "build") resetDraft();
+  render();
+}
+const blank = () => ({played:0, wins:0, streak:0, best:0, last:null, dist:[0,0,0,0,0,0]});
+function record(g){
+  const s = S[g]; if (s.practice) return;
+  const st = store.get("stats:" + g, blank());
+  st.played++;
+  if (s.won) {st.wins++; st.dist[s.rows.length - 1]++; st.streak = st.last === DAY - 1 ? st.streak + 1 : 1; st.best = Math.max(st.best, st.streak);}
+  else st.streak = 0;
+  st.last = DAY; store.set("stats:" + g, st);
+}
+
+// ---------- Who's the player? ----------
+const CLUES = [
+  ["Country", a => `${flag(a.c)}${CNAME[a.c] || a.c}`],
+  ["Role", a => ROLE[a.r] || a.r],
+  ["IPL matches", a => a.m],
+  ["Runs / wickets", a => `${a.ru.toLocaleString("en-IN")} / ${a.w}`],
+  ["Initials", a => a.n.replace(/\(.*\)/, "").trim().split(/\s+/).map(w => w[0]).join(". ") + "."]
+];
+function colourPath(guess, ans){
+  // per stint of the guessed player's path: hit = same team at the same position, close = team appears in answer path
+  const teams = ans.path.map(s => s[0]);
+  return guess.path.map(([t], i) => ({t, s: teams[i] === t ? "hit" : teams.includes(t) ? "close" : "miss"}));
+}
+function renderGuess(){
+  const s = S.guess, a = s.answer;
+  $("#gPath").innerHTML = a.path.map(([t, ys]) => `<li><span class="yr">${yrs(ys)}</span><span class="chip"><b>${t}</b><span>${TEAM[t] || t}</span></span></li>`).join("");
+  const wrong = s.rows.filter(id => id !== a.id).length, open = s.done ? CLUES.length : wrong;
+  $("#gClues").innerHTML = CLUES.map(([label, f], i) => i < open
+    ? `<div class="clue on">${label}<b>${f(a)}</b></div>`
+    : `<div class="clue">${label}<b>Unlocks after ${i + 1} wrong guess${i ? "es" : ""}</b></div>`).join("");
+  $("#gRows").innerHTML = s.rows.map(id => {
+    const p = byId.get(id), win = id === a.id;
+    const cells = colourPath(p, a).map(c => `<i class="${c.s}">${c.t}</i>`).join("");
+    return `<div class="g${win ? " win" : ""}"><span class="nm">${flag(p.c)}${p.n}${win ? " ✓" : ""}</span><span class="mini" aria-label="${p.n}'s path: ${p.path.map(x => x[0]).join(", ")}">${cells}</span></div>`;
+  }).join("");
+  $("#gLeft").innerHTML = s.done ? `<b>${s.won ? `Got it in ${s.rows.length}` : "Out of guesses"}</b>` : `<b>${GAME.guess.max - s.rows.length}</b> guesses left`;
+  $("#q").disabled = s.done;
+  $("#q").placeholder = s.done ? (s.practice ? "Finished. Press Practice for another" : "Finished. A new path arrives at midnight") : "Who is it? Type a player's name";
+}
+let hits = [], sel = 0;
+function search(){
+  const q = norm($("#q").value.trim()); hits = [];
+  if (q.length >= 2) {
+    const used = new Set(S.guess.rows);
+    for (const p of P) {
+      if (used.has(p.id)) continue;
+      const n = norm(p.n), al = norm(p.al || "");
+      const sc = n.startsWith(q) ? 0 : n.split(" ").some(w => w.startsWith(q)) ? 1 : (n.includes(q) || al.includes(q)) ? 2 : -1;
+      if (sc >= 0) hits.push([sc, -p.m, p]);
+    }
+    hits = hits.sort((x, y) => x[0] - y[0] || x[1] - y[1]).slice(0, 8).map(x => x[2]);
+  }
+  sel = 0; drawList();
+}
+function drawList(){
+  const L = $("#list");
+  L.innerHTML = hits.map((p, i) => `<li role="option" id="o${i}" aria-selected="${i === sel}" data-i="${i}"><span>${flag(p.c)}${p.n}</span><small>${p.d}–${p.ls}</small></li>`).join("");
+  if (!hits.length && norm($("#q").value).length >= 2) L.innerHTML = `<li aria-disabled="true"><span>No IPL legend matches that. Career Path only has Spot the Star players.</span></li>`;
+  $("#q").setAttribute("aria-expanded", hits.length ? "true" : "false");
+  if (hits.length) $("#q").setAttribute("aria-activedescendant", "o" + sel); else $("#q").removeAttribute("aria-activedescendant");
+  L.querySelectorAll("li[data-i]").forEach(li => li.onmousedown = e => {e.preventDefault(); pickGuess(hits[+li.dataset.i]);});
+}
+function pickGuess(p){
+  const s = S.guess; if (!p || s.done) return;
+  s.rows.push(p.id); $("#q").value = ""; hits = []; drawList();
+  if (p.id === s.answer.id) {s.done = true; s.won = true;}
+  else if (s.rows.length >= GAME.guess.max) s.done = true;
+  if (s.done) record("guess");
+  save("guess"); render();
+  if (s.done) setTimeout(() => showRes(true), 500); else $("#q").focus();
+}
+$("#q").addEventListener("input", search);
+$("#q").addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" && hits.length) {sel = (sel + 1) % hits.length; drawList(); e.preventDefault();}
+  else if (e.key === "ArrowUp" && hits.length) {sel = (sel - 1 + hits.length) % hits.length; drawList(); e.preventDefault();}
+  else if (e.key === "Enter" && hits.length) {pickGuess(hits[sel]); e.preventDefault();}
+  else if (e.key === "Escape") {hits = []; drawList();}
+});
+$("#q").addEventListener("blur", () => setTimeout(() => {hits = []; drawList();}, 150));
+
+// ---------- Build the path ----------
+let draft = [], cur = 0;
+function resetDraft(){
+  const s = S.build, n = s.answer.path.length;
+  draft = Array(n).fill(null);
+  // carry greens forward from the last checked row
+  const last = s.rows[s.rows.length - 1];
+  if (last) last.forEach((t, i) => {if (t === s.answer.path[i][0]) draft[i] = t;});
+  cur = draft.findIndex(t => !t); if (cur < 0) cur = 0;
+}
+function scoreRow(row, ans){
+  // Wordle-style colouring with repeated teams handled by counts
+  const want = ans.path.map(s => s[0]), res = row.map(() => "miss"), left = {};
+  row.forEach((t, i) => {if (t === want[i]) res[i] = "hit"; else left[want[i]] = (left[want[i]] || 0) + 1;});
+  row.forEach((t, i) => {if (res[i] !== "hit" && left[t]) {res[i] = "close"; left[t]--;}});
+  return res;
+}
+function renderBuild(){
+  const s = S.build, a = s.answer, n = a.path.length;
+  const teams = new Set(a.path.map(x => x[0])).size;
+  $("#bWho").innerHTML = `<span class="av" aria-hidden="true">${a.n.replace(/\(.*\)/, "").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("")}</span><div><h3>${flag(a.c)}${a.n}</h3><p>${ROLE[a.r] || a.r}, ${a.m} IPL matches, ${a.d}–${a.ls}. ${teams} franchise${teams > 1 ? "s" : ""} in ${n} stints.</p></div>`;
+  $("#bRows").style.setProperty("--n", n);
+  let html = s.rows.map(row => {
+    const sc = scoreRow(row, a);
+    return `<div class="brow" style="--n:${n}">${row.map((t, i) => `<div class="slot ${sc[i]}" aria-label="${yrs(a.path[i][1])}: ${TEAM[t]}, ${({hit:"right", close:"in his path, different place", miss:"not in his path"})[sc[i]]}"><b>${t}</b><small>${yrs(a.path[i][1])}</small></div>`).join("")}</div>`;
+  }).join("");
+  if (!s.done) {
+    html += `<div class="brow" style="--n:${n}">${draft.map((t, i) => `<button type="button" class="slot${i === cur ? " sel" : ""}" data-i="${i}" aria-label="Stint ${i + 1}, ${yrs(a.path[i][1])}: ${t ? TEAM[t] : "empty"}"><b>${t || "?"}</b><small>${yrs(a.path[i][1])}</small></button>`).join("")}</div>`;
+    const empties = GAME.build.max - s.rows.length - 1;
+    for (let k = 0; k < empties; k++) html += `<div class="brow" style="--n:${n}">${a.path.map(x => `<div class="slot" aria-hidden="true"><small>${yrs(x[1])}</small></div>`).join("")}</div>`;
+  }
+  $("#bRows").innerHTML = html;
+  $("#bRows").querySelectorAll("button.slot").forEach(b => b.onclick = () => {cur = +b.dataset.i; renderBuild();});
+  const ys = a.path[cur] ? a.path[cur][1] : [];
+  $("#bPick").innerHTML = s.done ? "" : Object.keys(TEAM).filter(t => ACTIVE[t]).sort().map(t => {
+    const ok = ys.some(y => ACTIVE[t].has(y));
+    return `<button type="button" data-t="${t}" ${ok ? "" : "disabled"} title="${TEAM[t]}${ok ? "" : " didn't play in these seasons"}"><b>${t}</b><small>${TEAM[t].split(" ").slice(-1)[0]}</small></button>`;
+  }).join("");
+  $("#bPick").querySelectorAll("button").forEach(b => b.onclick = () => {
+    draft[cur] = b.dataset.t;
+    const nxt = draft.findIndex((t, i) => i > cur && !t); cur = nxt >= 0 ? nxt : draft.findIndex(t => !t) >= 0 ? draft.findIndex(t => !t) : cur;
+    renderBuild();
+  });
+  $("#bPick").hidden = $("#bHint").hidden = s.done;
+  $("#bCheck").hidden = $("#bClear").hidden = s.done;
+  $("#bCheck").disabled = draft.some(t => !t);
+}
+$("#bCheck").onclick = () => {
+  const s = S.build; if (s.done || draft.some(t => !t)) return;
+  s.rows.push([...draft]);
+  if (scoreRow(draft, s.answer).every(c => c === "hit")) {s.done = true; s.won = true;}
+  else if (s.rows.length >= GAME.build.max) s.done = true;
+  if (s.done) record("build");
+  save("build"); resetDraft(); render();
+  if (s.done) setTimeout(() => showRes(true), 500);
+};
+$("#bClear").onclick = () => {resetDraft(); draft = draft.map((t, i) => {const l = S.build.rows[S.build.rows.length - 1]; return l && l[i] === S.build.answer.path[i][0] ? t : null;}); cur = Math.max(0, draft.findIndex(t => !t)); renderBuild();};
+
+// ---------- shared UI ----------
+function render(){
+  const s = S[game];
+  $("#tGuess").setAttribute("aria-selected", game === "guess"); $("#tBuild").setAttribute("aria-selected", game === "build");
+  $("#pGuess").hidden = game !== "guess"; $("#pBuild").hidden = game !== "build";
+  $("#lab").innerHTML = s.practice ? `Practice<small>A random player. Doesn't count towards your stats.</small>` : `Career Path #${DAY + 1}<small>${GAME[game].label}: today's daily puzzle</small>`;
+  $("#bPractice").setAttribute("aria-pressed", s.practice ? "true" : "false");
+  $("#bPractice span").textContent = s.practice ? "Back to today" : "Practice";
+  if (game === "guess") renderGuess(); else renderBuild();
+}
+function shareText(){
+  const s = S[game], E = {hit:"🟩", close:"🟨", miss:"🟥"};
+  const head = `Wicketle Career Path ${s.practice ? "practice" : "#" + (DAY + 1)} (${GAME[game].label}) ${s.won ? s.rows.length : "X"}/${GAME[game].max}`;
+  const grid = game === "guess"
+    ? s.rows.map(id => id === s.answer.id ? "✅" : "❌").join("")
+    : s.rows.map(r => scoreRow(r, s.answer).map(c => E[c]).join("")).join("\n");
+  return head + "\n" + grid + (/^https?:$/.test(location.protocol) ? "\n" + location.origin + location.pathname : "");
+}
+function showRes(withResult){
+  const s = S[game], a = s.answer, r = withResult && s.done, st = store.get("stats:" + game, blank());
+  $("#rTitle").textContent = r ? (s.won ? "Well played" : "Bowled out") : `${GAME[game].label} statistics`;
+  $("#rBody").innerHTML = r ? `<div class="reveal"><span>${game === "guess" ? "The player was" : "His path was"}</span><strong>${flag(a.c)}${a.n}</strong><span>${a.path.map(([t, ys]) => `${t} ${yrs(ys)}`).join(" → ")}</span></div>` : "";
+  const streak = st.last != null && st.last >= DAY - 1 ? st.streak : 0;
+  $("#rStats").innerHTML = [[st.played, "Played"], [st.played ? Math.round(st.wins / st.played * 100) : 0, "Win %"], [streak, "Streak"], [st.best, "Best streak"]].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("");
+  $("#rActs").innerHTML = (r ? `<button class="btn" id="bShare" type="button">Copy result</button>` : "") + `<button class="btn ghost" id="bNew" type="button">${s.practice ? "New practice player" : "Play practice"}</button>`;
+  $("#shareBox").hidden = true;
+  if ($("#bShare")) $("#bShare").onclick = async () => {
+    const t = shareText();
+    try {await navigator.clipboard.writeText(t); toast("Result copied");}
+    catch (e) {const b = $("#shareBox"); b.value = t; b.hidden = false; b.select(); toast("Select and copy the text below");}
+  };
+  $("#bNew").onclick = () => {$("#dRes").close(); practice(game);};
+  if (!$("#dRes").open) $("#dRes").showModal();
+}
+function setGame(g){game = g; store.set("tab", g); render();}
+$("#tGuess").onclick = () => setGame("guess");
+$("#tBuild").onclick = () => setGame("build");
+document.querySelector(".tabs").addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {const g = game === "guess" ? "build" : "guess"; setGame(g); $(g === "guess" ? "#tGuess" : "#tBuild").focus(); e.preventDefault();}
+});
+$("#bPractice").onclick = () => S[game].practice ? (load(game), render()) : practice(game);
+$("#bStats").onclick = () => showRes(S[game].done);
+document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => b.closest("dialog").close());
+$("#dRes").addEventListener("click", e => {if (e.target === $("#dRes")) $("#dRes").close();});
+
+const root = document.documentElement, sys = matchMedia("(prefers-color-scheme: dark)");
+const curTheme = () => root.dataset.theme || (sys.matches ? "dark" : "light");
+const applyTheme = t => {root.dataset.theme = t; $("#bTheme").setAttribute("aria-pressed", t === "dark" ? "true" : "false");};
+applyTheme(curTheme());
+$("#bTheme").onclick = () => {const t = curTheme() === "dark" ? "light" : "dark"; applyTheme(t); try{localStorage.setItem("crickdle:theme", JSON.stringify(t));}catch(e){}};
+try {if (JSON.parse(localStorage.getItem("crickdle:cb"))) root.classList.add("cb");} catch(e) {}
+{const q = new URLSearchParams(location.search).get("game"); if (q === "guess" || q === "build") game = q;}
+
+load("guess"); load("build"); render();
+if (S[game].done) showRes(true);
+}
+</script>
+</body>
+</html>

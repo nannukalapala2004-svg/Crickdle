@@ -92,3 +92,12 @@ The web config (apiKey and so on) is not a secret: it only identifies the projec
 Each signed-in player has one document, `users/<their uid>`, holding `{hist: {<mode>: {<day>: entry}}, updated}`. On sign-in the device's history and the account's history are merged (a finished game beats an unfinished one; a game counts as daily if any device played it on its day). After that, every guess is saved to the account.
 
 Note: saved progress uses `localStorage` keys starting `crickdle:` (the game's earlier name). They are kept on purpose so players don't lose their history; don't rename them.
+
+## Career Path (`path/`)
+A second game with two modes, each with its own daily puzzle (resets at local midnight) and unlimited practice:
+- **Who's the player?** Shows an IPL legend's career path (every franchise he played for, in order, with seasons). Guess the player in 6 tries. Each guess shows that player's path coloured against the answer (green same team in the same place, yellow team in the path elsewhere, red not in the path). Wrong guesses unlock clues: country, role, matches, runs/wickets, initials.
+- **Build the path.** Shows the player; fill in the franchise for each stint (seasons shown on each slot; teams that didn't play in those seasons are disabled). 6 tries, Wordle-style colours, greens carry over.
+
+Only Spot the Star players (`data/iconic.txt`) are used, as answers and as guesses. Answers are the legends who played for 2+ franchises (66; Build the path uses those with 2–7 stints). Daily answers are seeded random picks, never the same two days running.
+
+Data: `scripts/build_paths.py <cricsheet json dir> data/paths.json` builds each player's season-by-season franchise path (the franchise he played for each season, grouped into stints; seasons in a squad without playing aren't included). `data/flags.json` holds the flag drawings shared with Player of the Day. `scripts/build_site.py` builds `path/index.html` from `src/path.html`. Progress is stored under `crickdle:cp:` in localStorage. Google sign-in sync doesn't cover Career Path yet.

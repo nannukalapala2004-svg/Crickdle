@@ -58,6 +58,12 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .today strong{color:var(--chalk);font-weight:600}
 
 
+.mpath{list-style:none;margin:0;padding:0;display:grid;gap:10px;justify-self:center;width:min(100%,280px)}
+.mpath li{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:12px;position:relative}
+.mpath span{font-size:13px;color:var(--chalk-2);text-align:right;font-variant-numeric:tabular-nums}
+.mpath b{padding:10px 14px;border-radius:12px;background:var(--slot);border:1px solid rgb(255 255 255/.08);letter-spacing:.03em}
+.mpath li+li::before{content:"";position:absolute;left:82px;top:-11px;width:2px;height:12px;background:rgb(217 174 91/.45)}
+.mpath li:last-child b{background:var(--hit);border-color:var(--hit);color:#fff}
 .soon{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:22px;border:1.5px dashed light-dark(#c9cde0,rgb(255 255 255/.14));color:var(--muted)}
 .soon svg{width:40px;height:40px;flex:none;color:var(--gold)}
 .soon h2{margin:0;font-size:17px;color:var(--ink);font-weight:600}
@@ -73,6 +79,7 @@ footer a{text-decoration-color:var(--gold);text-underline-offset:3px}
 
 @media(max-width:720px){
   .game{grid-template-columns:1fr;padding:22px 18px;gap:20px}
+  .mpath{justify-self:start;order:-1;width:100%}
   .tiles{justify-self:start;order:-1;gap:6px}.tiles div{gap:6px}.tiles i{width:30px;height:30px;border-radius:8px}
   .play{width:100%;justify-content:center}
   .intro{margin:28px 0 20px}
@@ -142,22 +149,34 @@ const GAMES = [
     blurb: "Guess the IPL player in 8 tries. Every guess shows how close you are on country, role, team, age and career stats. One daily puzzle in Full Toss mode, plus practice modes from Good Length and Yorker to Spot the Star.",
     // little board picture: one string per row; h = green, c = yellow, m = red, e = empty
     board: ["mmcmm", "chmch", "hhhhh"]
+  },
+  {
+    id: "path",
+    href: "path/",
+    tag: "Daily",
+    title: "Career Path",
+    blurb: "Follow an IPL legend's career from franchise to franchise and name the player. Or flip it: see the player and rebuild his path, team by team.",
+    // little career timeline picture: [seasons, team]
+    path: [["2008–10", "KKR"], ["2011–17", "RCB"], ["2018–21", "PBKS"]],
+    next: "path"
   }
 ];
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let html = "";
 for (const g of GAMES) {
-  const board = g.board.map(r => `<div>${[...r].map(t => `<i class="${t}"></i>`).join("")}</div>`).join("");
+  const art = g.board
+    ? `<div class="tiles" aria-hidden="true">${g.board.map(r => `<div>${[...r].map(t => `<i class="${t}"></i>`).join("")}</div>`).join("")}</div>`
+    : `<ol class="mpath" aria-hidden="true">${g.path.map(([y, t]) => `<li><span>${y}</span><b>${t}</b></li>`).join("")}</ol>`;
   html += `<article class="game" aria-labelledby="t-${g.id}">
     <div>
       <span class="tag">${esc(g.tag)}</span>
       <h2 id="t-${g.id}">${esc(g.title)}</h2>
       <p>${esc(g.blurb)}</p>
       <a class="play" href="${g.href}">Play today's puzzle</a>
-      <p class="today">Player of the Day #${DAY + 1}. New player every day at <strong>12:00 AM</strong> your time. Next one in <strong class="next"></strong>.</p>
+      <p class="today">${g.title} #${DAY + 1}. New ${g.next || "player"} every day at <strong>12:00 AM</strong> your time. Next one in <strong class="next"></strong>.</p>
     </div>
-    <div class="tiles" aria-hidden="true">${board}</div>
+    ${art}
   </article>`;
 }
 html += `<section class="soon">

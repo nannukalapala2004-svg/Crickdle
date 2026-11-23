@@ -69,6 +69,17 @@ if missing:
     raise SystemExit(f"data/iconic.txt names not found in players: {missing}")
 html = open("src/template.html", encoding="utf-8").read().replace("/*__DATA__*/[]", data).replace("/*__ICONIC__*/[]", json.dumps([by_name[n] for n in iconic]))
 import os, shutil
+# Career Path game: players + their season-by-season franchise paths (data/paths.json from build_paths.py)
+paths = json.load(open("data/paths.json", encoding="utf-8"))
+icon_ids = {by_name[n] for n in iconic}
+cp_players = [[r[0], r[1], r[2], r[3], r[4], r[8], r[9], r[10], r[7], r[12]] for r in rows if r[0] in icon_ids]
+cp = open("src/path.html", encoding="utf-8").read()
+cp = cp.replace("/*__PATHDATA__*/{players:[], paths:{}}", json.dumps({"players": cp_players, "paths": paths}, ensure_ascii=False, separators=(",", ":")))
+cp = cp.replace("/*__FLAGS__*/{}", open("data/flags.json", encoding="utf-8").read())
+cp = cp.replace("/*__ICONIC__*/[]", json.dumps([by_name[n] for n in iconic]))
+os.makedirs("path", exist_ok=True)
+with open("path/index.html", "w", encoding="utf-8") as f:
+    f.write(cp)
 os.makedirs("player", exist_ok=True)
 with open("player/index.html", "w", encoding="utf-8") as f:
     f.write(html)
