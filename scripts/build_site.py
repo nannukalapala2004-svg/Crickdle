@@ -61,7 +61,13 @@ for r in rows:
 with open("data/players.json", "w", encoding="utf-8") as f:
     json.dump(rows, f, ensure_ascii=False, separators=(",", ":"))
 data = json.dumps(rows, ensure_ascii=False, separators=(",", ":"))
-html = open("src/template.html", encoding="utf-8").read().replace("/*__DATA__*/[]", data)
+# Iconic players mode: names listed in data/iconic.txt
+by_name = {r[1]: r[0] for r in rows}
+iconic = [l.strip() for l in open("data/iconic.txt", encoding="utf-8") if l.strip() and not l.startswith("#")]
+missing = [n for n in iconic if n not in by_name]
+if missing:
+    raise SystemExit(f"data/iconic.txt names not found in players: {missing}")
+html = open("src/template.html", encoding="utf-8").read().replace("/*__DATA__*/[]", data).replace("/*__ICONIC__*/[]", json.dumps([by_name[n] for n in iconic]))
 import os, shutil
 os.makedirs("player", exist_ok=True)
 with open("player/index.html", "w", encoding="utf-8") as f:
